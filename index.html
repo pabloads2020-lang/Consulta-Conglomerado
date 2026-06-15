@@ -1,0 +1,1735 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="data-atualizacao" content="15/06/2026, 22:38">
+    <title>Conglomerados Prudenciais</title>
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.2/package/dist/xlsx.full.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg:    #0d0f17;
+            --bg2:   #141720;
+            --bg3:   #1a1e2b;
+            --border:#2a2e3f;
+            --text:  #e1e3ef;
+            --text2: #9a9eb8;
+            --text3: #5c6080;
+            --gold:  #f5c842;
+            --amber: #e0ac2c;
+            --green: #2ecc71;
+            --red:   #e74c3c;
+            --blue:  #4a9eff;
+        }
+        body.light {
+            --bg:    #f4f5f7;
+            --bg2:   #ffffff;
+            --bg3:   #eef0f4;
+            --border:#d4d8e2;
+            --text:  #1a1d2e;
+            --text2: #4a4f6a;
+            --text3: #8a90a8;
+            --gold:  #b8860b;
+            --amber: #c47d00;
+            --green: #1a8a4a;
+            --red:   #c0392b;
+            --blue:  #1565c0;
+        }
+
+        /* ==== TOPBAR PADRÃO HUB FINANCEIRO ==== */
+        .hub-topbar {
+            --bg-topbar: #141720;
+            --border-topbar: #2a2e3f;
+            --text-topbar: #e1e3ef;
+            --text2-topbar: #9a9eb8;
+            --text3-topbar: #5c6080;
+            --gold-topbar: #f5c842;
+            --amber-topbar: #e0ac2c;
+            font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg-topbar);
+            border-bottom: 1px solid var(--border-topbar);
+            height: 52px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            gap: 12px;
+            position: sticky;
+            top: 0;
+            z-index: 200;
+        }
+        body.light .hub-topbar {
+            --bg-topbar: #ffffff;
+            --border-topbar: #d4d8e2;
+            --text-topbar: #1a1d2e;
+            --text2-topbar: #4a4f6a;
+            --text3-topbar: #8a90a8;
+            --gold-topbar: #b8860b;
+            --amber-topbar: #c47d00;
+        }
+        .hub-topbar-left, .hub-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .hub-topbar-center {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .hub-pbf-badge {
+            background: var(--gold-topbar);
+            padding: 0 12px;
+            height: 30px;
+            border-radius: 40px;
+            display: flex;
+            align-items: center;
+            font-size: 12px;
+            font-weight: 800;
+            color: #000;
+            letter-spacing: 0.5px;
+        }
+        .hub-topbar-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-topbar);
+            white-space: nowrap;
+        }
+        .hub-back-btn, .hub-newtab-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            background: transparent;
+            border: 1px solid var(--border-topbar);
+            border-radius: 8px;
+            color: var(--text2-topbar);
+            font-family: inherit;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 5px 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            white-space: nowrap;
+        }
+        .hub-back-btn:hover, .hub-newtab-btn:hover {
+            border-color: var(--amber-topbar);
+            color: var(--gold-topbar);
+        }
+        .hub-back-btn .material-symbols-outlined,
+        .hub-newtab-btn .material-symbols-outlined { font-size: 16px; }
+        .hub-active-tool {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--gold-topbar);
+            white-space: nowrap;
+        }
+        .hub-clock {
+            font-size: 11px;
+            color: var(--text3-topbar);
+            font-variant-numeric: tabular-nums;
+            background: var(--bg-topbar);
+            padding: 4px 10px;
+            border-radius: 30px;
+            border: 1px solid var(--border-topbar);
+        }
+        .hub-theme-btn {
+            background: var(--bg-topbar);
+            border: 1px solid var(--border-topbar);
+            border-radius: 30px;
+            width: 34px; height: 34px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; font-size: 16px; transition: border-color 0.2s; flex-shrink: 0;
+        }
+        .hub-theme-btn:hover { border-color: var(--gold-topbar); }
+        .material-symbols-outlined {
+            font-family: 'Material Symbols Outlined';
+            font-weight: normal; font-style: normal; font-size: 20px;
+            line-height: 1; letter-spacing: normal; text-transform: none;
+            display: inline-block; white-space: nowrap; word-wrap: normal;
+            direction: ltr;
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        @media (max-width: 600px) {
+            .hub-back-btn span:not(.material-symbols-outlined),
+            .hub-newtab-btn span:not(.material-symbols-outlined) { display: none; }
+            .hub-back-btn, .hub-newtab-btn { padding: 5px 8px; }
+            .hub-active-tool { font-size: 13px; max-width: 140px; overflow: hidden; text-overflow: ellipsis; }
+            .hub-clock { font-size: 10px; padding: 4px 6px; }
+        }
+        /* ==== FIM TOPBAR ==== */
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background: var(--bg); font-family: "DM Sans", sans-serif; color: var(--text); padding: 0; min-height: 100vh; transition: background .2s, color .2s; }
+        .container { max-width: 1100px; margin: 0 auto; padding: 28px 20px; }
+
+        /* ── Header ── */
+        .page-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px; margin-bottom:6px; }
+        .page-title { font-size:1.5rem; font-weight:700; color:var(--gold); letter-spacing:-.02em; }
+        .page-subtitle { font-size:.8rem; color:var(--text3); padding-left:14px; border-left:3px solid var(--amber); margin-bottom:20px; }
+        #dataAtualizacao { margin-left:8px; font-size:.75rem; color:var(--text3); }
+
+        /* ── Cards ── */
+        .card { background:var(--bg2); border:1px solid var(--border); border-radius:16px; padding:22px 24px; margin-bottom:20px; }
+
+        /* ── Stats bar ── */
+        .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
+        .stat-pill { display:inline-flex; align-items:center; gap:0; background:var(--bg3); border:1px solid var(--border); border-radius:20px; overflow:hidden; font-size:11px; font-weight:600; color:var(--text2); padding-right:14px; }
+        .stat-pill .dot { width:4px; align-self:stretch; flex:0 0 4px; display:block; margin-right:10px; }
+        .dot-gold  { background:var(--gold); }
+        .dot-green { background:var(--green); }
+        .dot-blue  { background:var(--blue); }
+
+        /* ── Search ── */
+        .search-wrap { position:relative; }
+        .search-wrap label { display:block; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:1px; color:var(--text3); margin-bottom:8px; }
+        .search-inner { position:relative; }
+        .search-inner input {
+            width:100%; background:var(--bg3); border:1px solid var(--border);
+            padding:11px 40px 11px 16px; border-radius:40px;
+            color:var(--text); font-size:.9rem; font-family:inherit; transition:border-color .2s;
+        }
+        .search-inner input:focus { outline:none; border-color:var(--amber); }
+        .search-inner input::placeholder { color:var(--text3); }
+        .clear-btn {
+            position:absolute; right:12px; top:50%; transform:translateY(-50%);
+            background:none; border:none; color:var(--text3); cursor:pointer;
+            font-size:1rem; padding:4px; display:none; align-items:center;
+            justify-content:center; border-radius:50%; transition:.2s;
+        }
+        .clear-btn:hover { color:var(--gold); background:var(--border); }
+        .autocomplete-items {
+            position:absolute; top:calc(100% + 6px); left:0; right:0;
+            background:var(--bg2); border:1px solid var(--border); border-radius:14px;
+            max-height:280px; overflow-y:auto; z-index:100;
+            box-shadow:0 8px 24px rgba(0,0,0,.5);
+        }
+        .autocomplete-item {
+            padding:10px 16px; cursor:pointer;
+            border-bottom:1px solid var(--border);
+            display:flex; justify-content:space-between; align-items:center;
+            gap:12px; transition:background .1s;
+        }
+        .autocomplete-item:last-child { border-bottom:none; }
+        .autocomplete-item:hover, .autocomplete-item.active { background:var(--bg3); }
+        .autocomplete-item.active { border-left:3px solid var(--amber); }
+        .ac-main { flex:1; font-size:.85rem; color:var(--text); line-height:1.35; }
+        .ac-main mark { background:rgba(245,200,66,.2); color:var(--gold); border-radius:3px; font-style:normal; }
+        .ac-cong { font-size:.7rem; color:var(--text3); margin-top:2px; }
+        .tipo-badge { font-size:.67rem; padding:3px 9px; border-radius:20px; font-weight:700; white-space:nowrap; flex-shrink:0; }
+        .tipo-lider   { background:rgba(245,200,66,.12); color:var(--gold);  border:1px solid rgba(245,200,66,.3); }
+        .tipo-holding { background:rgba(74,158,255,.1);  color:var(--blue);  border:1px solid rgba(74,158,255,.3); }
+        .tipo-part    { background:rgba(74,158,255,.1); color:var(--blue); border:1px solid rgba(74,158,255,.3); }
+
+        /* ── Result card ── */
+        .result-header {
+            display:flex; align-items:flex-start; gap:14px;
+            padding-bottom:16px; margin-bottom:16px; border-bottom:1px solid var(--border);
+        }
+        .result-icon {
+            width:44px; height:44px; border-radius:12px;
+            background:rgba(245,200,66,.08); border:1px solid rgba(245,200,66,.2);
+            display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+        }
+        .result-main { flex:1; min-width:0; }
+        .result-participante { font-size:1.1rem; font-weight:700; color:var(--text); line-height:1.3; word-break:break-word; }
+        .result-cong-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.8px; color:var(--text3); font-weight:700; margin-top:8px; margin-bottom:3px; }
+        .result-cong-name { font-size:1.05rem; font-weight:700; color:var(--gold); letter-spacing:-.01em; word-break:break-word; }
+        .result-tipo { margin-left:auto; flex-shrink:0; }
+
+        /* ── Siblings list ── */
+        .siblings-label { font-size:.68rem; text-transform:uppercase; letter-spacing:.8px; color:var(--text3); font-weight:700; margin-bottom:10px; }
+        .siblings-list { display:flex; flex-direction:column; gap:5px; }
+        .sibling-row {
+            display:flex; align-items:center; gap:10px;
+            background:var(--bg3); border:1px solid var(--border); border-radius:10px;
+            padding:9px 13px; cursor:pointer; transition:all .15s;
+        }
+        .sibling-row:hover { border-color:rgba(245,200,66,.3); background:rgba(245,200,66,.04); }
+        .sibling-row.selected { border-color:rgba(245,200,66,.4); background:rgba(245,200,66,.07); }
+        .sib-dot { width:6px; height:6px; border-radius:50%; background:var(--border); flex-shrink:0; }
+        .sib-dot.lider { background:var(--gold); }
+        .sib-name { flex:1; font-size:.82rem; color:var(--text); line-height:1.35; font-weight:500; }
+        .sibling-row.selected .sib-name { color:var(--amber); }
+        .sib-tipo { font-size:.65rem; font-weight:700; color:var(--text3); white-space:nowrap; }
+
+        /* ── Admin button ── */
+        .admin-btn {
+            background:var(--bg3); border:1px solid var(--border);
+            padding:8px 18px; border-radius:30px; color:var(--text2);
+            font-size:.78rem; font-weight:600; cursor:pointer; font-family:inherit; transition:.2s; white-space:nowrap;
+        }
+        .admin-btn:hover { border-color:var(--amber); color:var(--gold); }
+
+        /* ── Modal ── */
+        .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.75); z-index:1000; justify-content:center; align-items:center; }
+        .modal-content { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:28px; width:90%; max-width:400px; }
+        .modal-content h3 { font-size:1rem; font-weight:700; color:var(--gold); margin-bottom:16px; }
+        .modal-content input[type=password] {
+            width:100%; background:var(--bg3); border:1px solid var(--border);
+            padding:10px 16px; border-radius:30px; color:var(--text);
+            font-family:inherit; font-size:.9rem; margin:12px 0;
+        }
+        .modal-content input[type=password]:focus { outline:none; border-color:var(--amber); }
+        .upload-area-sm {
+            border:1px dashed var(--border); border-radius:12px;
+            padding:16px; text-align:center; margin-top:12px; cursor:pointer;
+            color:var(--text3); font-size:.85rem; transition:border-color .2s; position:relative;
+        }
+        .upload-area-sm:hover { border-color:var(--amber); color:var(--text2); }
+        .upload-area-sm input[type=file] { display:none; }
+        .flex-btns { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
+        .btn { background:var(--bg3); border:1px solid var(--border); padding:8px 20px; border-radius:30px; color:var(--text2); font-family:inherit; font-size:.82rem; cursor:pointer; transition:.2s; }
+        .btn:hover { border-color:var(--amber); color:var(--gold); }
+
+        /* ── Empty / footer ── */
+        .empty-msg { text-align:center; padding:40px; color:var(--text3); font-size:.9rem; }
+        footer { text-align:center; font-size:.7rem; color:var(--text3); margin-top:16px; }
+
+        @keyframes fadeSlideIn { from { opacity:0; transform:translateY(6px); } to { opacity:1; transform:translateY(0); } }
+        .result-anim { animation: fadeSlideIn .2s ease; }
+
+        @media (max-width:640px) { .container { padding:16px; } }
+    </style>
+</head>
+<body>
+
+<!-- ==== TOPBAR PADRÃO HUB FINANCEIRO ==== -->
+<div class="hub-topbar">
+    <div class="hub-topbar-left">
+        <div class="hub-pbf-badge">PBF</div>
+        <span class="hub-topbar-title">Hub Financeiro</span>
+        <button class="hub-back-btn" id="hubBackBtn">
+            <span class="material-symbols-outlined">arrow_back</span>
+            <span>Voltar ao início</span>
+        </button>
+    </div>
+    <div class="hub-topbar-center">
+        <span class="hub-active-tool">Conglomerados Prudenciais</span>
+    </div>
+    <div class="hub-topbar-right">
+        <button class="hub-newtab-btn" id="hubNewTabBtn">
+            <span class="material-symbols-outlined">open_in_new</span>
+            <span>Nova aba</span>
+        </button>
+        <span class="hub-clock" id="hubClock"></span>
+        <button class="hub-theme-btn" id="hubThemeBtn">🌙</button>
+    </div>
+</div>
+<!-- ==== FIM TOPBAR ==== -->
+
+<div class="container">
+    <div class="card">
+        <div class="page-header">
+            <div>
+                <div class="page-title">Conglomerados Prudenciais</div>
+            </div>
+            <button class="admin-btn" id="adminBtn">🔧 Atualizar base</button>
+        </div>
+        <div class="page-subtitle">
+            Consulte a qual conglomerado prudencial pertence cada participante — Base do Banco Central
+            <span id="dataAtualizacao"></span>
+        </div>
+
+        <div id="statsBar" class="stats-bar"></div>
+
+        <div class="search-wrap">
+            <label>🔍 Digite o nome do participante (mínimo 2 letras)</label>
+            <div class="search-inner">
+                <form onsubmit="return false;" autocomplete="off">
+                    <input type="hidden" name="dummy" value="prevent-pwd-manager">
+                    <input type="text" id="searchInput" autocomplete="off" autocorrect="off"
+                    autocapitalize="off" spellcheck="false"
+                    placeholder="Ex: BANCO ITAÚ, CREDITAS, C6, NUBANK, ABC BRASIL...">
+                    <button class="clear-btn" id="clearSearchBtn" type="button" title="Limpar">✖</button>
+                </form>
+                <div id="autocompleteList" class="autocomplete-items" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="resultArea" style="display:none;">
+        <div class="card result-anim" id="resultCard"></div>
+    </div>
+
+    <footer>💡 Dados embutidos nesta versão. Atualização apenas pelo administrador.</footer>
+</div>
+
+<!-- Admin modal -->
+<div id="adminModal" class="modal">
+    <div class="modal-content">
+        <h3>🔐 Atualização de dados</h3>
+        <form onsubmit="return false;" autocomplete="off">
+            <input type="password" id="adminPassword" placeholder="Senha de administrador" autocomplete="new-password">
+            <div id="uploadAreaModal" class="upload-area-sm" style="display:none;">
+                <div>📂 Clique ou arraste o novo arquivo Excel</div>
+                <div style="font-size:.72rem;margin-top:4px;color:var(--text3);">Colunas: NOME DO CONGLOMERADO · NOME DO PARTICIPANTE · TIPO PARTICIPAÇÃO</div>
+                <input type="file" id="adminFileInput" accept=".xlsx,.xls" autocomplete="off">
+            </div>
+        </form>
+        <div class="flex-btns">
+            <button class="btn" id="cancelModalBtn" type="button">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    const ADMIN_SENHA = "admin123";
+    let registros = [
+    {"CONGLOMERADO": "99PAY IP - PRUDENCIAL", "PARTICIPANTE": "99PAY INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "99PAY IP - PRUDENCIAL", "PARTICIPANTE": "99PAY SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "BANCO ABC BRASIL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC BRASIL ADMINISTRACAO E PARTICIPACOES LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC BRASIL BENEFICIOS CORRETORA DE SEGUROS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC BRASIL COMERCIALIZADORA DE ENERGIA LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC BRASIL CORRETORA DE SEGUROS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC BRASIL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC BRASIL INVESTMENT BANKING LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC DCM LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC HOLDING FINANCEIRA LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "ABC M&A E ECM LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "APOEMA FUND LTD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "BARAUNA FI FINANCEIRO - CI MULT CRED PRIV - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ABC-BRASIL - PRUDENCIAL", "PARTICIPANTE": "VISIO GESTORA DE CREDITOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AF DO ESTADO DE SC S.A. - PRUDENCIAL", "PARTICIPANTE": "AGÊNCIA DE FOMENTO DO ESTADO DE SANTA CATARINA S.A.-BADESC", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "AF DO ESTADO DE SC S.A. - PRUDENCIAL", "PARTICIPANTE": "BB POLO 42 FUNDO DE INVESTIMENTO EM RENDA FIXA LONGO PRAZO CRÉDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AF PARANÁ - PRUDENCIAL", "PARTICIPANTE": "AGÊNCIA DE FOMENTO DO PARANÁ S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "AF PARANÁ - PRUDENCIAL", "PARTICIPANTE": "BB URANO 4 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AF PARANÁ - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO CAIXA AFPR RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AF PARANÁ - PRUDENCIAL", "PARTICIPANTE": "PARANÁ FIDC DO SEGMENTO AGRONEGÓCIO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AGENCIA FOMENTO EST RJ S.A. - PRUDENCIAL", "PARTICIPANTE": "AGENCIA DE FOMENTO DO ESTADO DO RIO DE JANEIRO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "AGENCIA FOMENTO EST RJ S.A. - PRUDENCIAL", "PARTICIPANTE": "BB AGERIO FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AGIBANK - PRUDENCIAL", "PARTICIPANTE": "BANCO AGIBANK S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "AGIBANK - PRUDENCIAL", "PARTICIPANTE": "AGI FINANCEIRA S.A. - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "AGIBANK - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS AGIBANK I RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ANDBANK - PRUDENCIAL", "PARTICIPANTE": "BANCO ANDBANK (BRASIL) S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "ANDBANK - PRUDENCIAL", "PARTICIPANTE": "ANDBANK DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ANDBANK - PRUDENCIAL", "PARTICIPANTE": "CREDITAS SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL", "PARTICIPANTE": "ASAAS GESTÃO FINANCEIRA INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL", "PARTICIPANTE": "ASAAS FUNDO DE INVESTIMENTO MULTIMERCADO CRÉDITO  PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ASAAS GESTAO FINANCEIRA IP - PRUDENCIAL", "PARTICIPANTE": "ASAAS SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO AFINZ BM - PRUDENCIAL", "PARTICIPANTE": "BANCO AFINZ S.A. - BANCO MÚLTIPLO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANCO AFINZ BM - PRUDENCIAL", "PARTICIPANTE": "AFINZ INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO B3 - PRUDENCIAL", "PARTICIPANTE": "BANCO B3 S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BANCO B3 - PRUDENCIAL", "PARTICIPANTE": "B3 INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO BARI DE INVESTIMENTO E FINANCI. - PRUDENCIAL", "PARTICIPANTE": "BANCO BARI DE INVESTIMENTOS E FINANCIAMENTOS S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANCO BARI DE INVESTIMENTO E FINANCI. - PRUDENCIAL", "PARTICIPANTE": "BARI COMPANHIA HIPOTECÁRIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO BARI DE INVESTIMENTO E FINANCI. - PRUDENCIAL", "PARTICIPANTE": "BARI SECURITIZADORA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO C6 - PRUDENCIAL", "PARTICIPANTE": "BANCO C6 S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANCO C6 - PRUDENCIAL", "PARTICIPANTE": "BANCO C6 CONSIGNADO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO C6 - PRUDENCIAL", "PARTICIPANTE": "C6 BANK TV1 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO C6 - PRUDENCIAL", "PARTICIPANTE": "C6 CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO C6 - PRUDENCIAL", "PARTICIPANTE": "CARBONO FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CRED PRIV INVEST NO EXTERIOR - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "BANCO DIGIMAIS S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "ABEL FUNDO DE INVESTIMENTO EM PARTICIPACOES  MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "ALPHA FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "CAJAIBA FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "DELTA FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "HATIKVAH FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "ID 112 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NÃO-PADRONIZADOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "ID GOIANA FUNDO DE INVESTIMENTO FIAGRO IMOBILIARIO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "MONDO 2 FUNDO DE INVESTIMENTO FINANCEIRO  MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO DIGIMAIS - PRUDENCIAL", "PARTICIPANTE": "OMEGA FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO PAULISTA - PRUDENCIAL", "PARTICIPANTE": "BANCO PAULISTA S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANCO PAULISTA - PRUDENCIAL", "PARTICIPANTE": "PAULISTA COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO SICOOB - PRUDENCIAL", "PARTICIPANTE": "BANCO COOPERATIVO SICOOB S.A. - BANCO SICOOB", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANCO SICOOB - PRUDENCIAL", "PARTICIPANTE": "SICOOB ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO SICOOB - PRUDENCIAL", "PARTICIPANTE": "SICOOB AGENCIAS FUNDO DE INVESTIMENTO IMOBILIARIO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO SICOOB - PRUDENCIAL", "PARTICIPANTE": "SICOOB DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO SICOOB - PRUDENCIAL", "PARTICIPANTE": "SICOOB SOLUCOES DE PAGAMENTO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO TRAVELEX - PRUDENCIAL", "PARTICIPANTE": "BANCO TRAVELEX S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANCO TRAVELEX - PRUDENCIAL", "PARTICIPANTE": "CONFIDENCE CORRETORA DE CÂMBIO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANCO TRAVELEX - PRUDENCIAL", "PARTICIPANTE": "NUMBER ONE SOCIEDADE CORRETORA DE CAMBIO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANESTES - PRUDENCIAL", "PARTICIPANTE": "BANESTES S.A. BANCO DO ESTADO DO ESPIRITO SANTO", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BANESTES - PRUDENCIAL", "PARTICIPANTE": "BANESTES DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANESTES - PRUDENCIAL", "PARTICIPANTE": "BANESTES FIC MEZA I FI EM COTAS DE FI EM DIREITOS CREDITORIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANK OF CHINA (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BANK OF CHINA (BRASIL) BANCO MÚLTIPLO S/A", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BANK OF CHINA (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BANCO DA CHINA BRASIL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANK OF CHINA (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BOC BRASIL ADMINISTRADORA DE CARTOES DE CREDITO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANK OF CHINA (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BOC BRASIL ARRENDAMENTO MERCANTIL S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANK OF CHINA (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BOC BRASIL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANK OF CHINA (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BOC BRASIL S.A. - CRÉDITO, FINANCIAMENTOS E INVESTIMENTOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANQI IP - PRUDENCIAL", "PARTICIPANTE": "BANQI INSTITUICAO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BANQI IP - PRUDENCIAL", "PARTICIPANTE": "BANQI EP FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANQI IP - PRUDENCIAL", "PARTICIPANTE": "BANQI II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANQI IP - PRUDENCIAL", "PARTICIPANTE": "BANQI III FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANQI IP - PRUDENCIAL", "PARTICIPANTE": "BNQI SOCIEDADE DE CREDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANRISUL - PRUDENCIAL", "PARTICIPANTE": "BANCO DO ESTADO DO RIO GRANDE DO SUL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BANRISUL - PRUDENCIAL", "PARTICIPANTE": "BANRISUL S.A. - ADMINISTRADORA DE CONSÓRCIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANRISUL - PRUDENCIAL", "PARTICIPANTE": "BANRISUL S/A - CORRETORA DE VALORES MOBILIARIOS E CAMBIO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BANRISUL - PRUDENCIAL", "PARTICIPANTE": "BANRISUL SOLUÇÕES EM PAGAMENTOS S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BARU SCFI - PRUDENCIAL", "PARTICIPANTE": "BARU SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S/A", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BARU SCFI - PRUDENCIAL", "PARTICIPANTE": "BARU DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BANCO DO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "ATIVOS S.A. SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB  VENTURES I FIP MULTIESTRATEGIA - INVESTIMENTO NO  EXTERIOR - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB ADMINISTRADORA DE CARTOES DE CREDITO S A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB ADMINISTRADORA DE CONSORCIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB AGRO SELECAO FIF DA CLASSE DE INVESTIMENTO EM COTAS ACOES - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB ASSET DISTRIBUICAO ITAU ACOES AGRO FIC FIF RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB ESPELHO ACOES REGIA GLOBAL HEALTH SCIENCES IS FIC FIF RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB GESTÃO DE RECURSOS - DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB IMPACTO IS I FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB-BANCO DE INVESTIMENTO S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "BB-LEASING S/A ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES AGVENTURES II MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BB - PRUDENCIAL", "PARTICIPANTE": "REGIA GLOBAL HEALTH SCIENCES NET FIC DE FIF EM ACOES IS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BBC S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO BRASILEIRO DE CRÉDITO SOCIEDADE ANÔNIMA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BBC S.A. - PRUDENCIAL", "PARTICIPANTE": "BBC ADMINISTRADORA DE CONSÓRCIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO ABN AMRO CLEARING - PRUDENCIAL", "PARTICIPANTE": "BANCO ABN AMRO CLEARING S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO ABN AMRO CLEARING - PRUDENCIAL", "PARTICIPANTE": "ABN AMRO CLEARING CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO CLASSICO S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO CLASSICO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO CLASSICO S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCLASS FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO CLASSICO S.A. - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO DE AÇåES DINÂMICA ENERGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO COOPERATIVO SICREDI - PRUDENCIAL", "PARTICIPANTE": "BANCO COOPERATIVO SICREDI S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BCO COOPERATIVO SICREDI - PRUDENCIAL", "PARTICIPANTE": "ADMINISTRADORA DE CONSORCIOS SICREDI LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "BANCO DAYCOVAL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "DAY MAXX 4 FIDC DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "DAYCOVAL CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "DAYCOVAL LEASING - BANCO MÚLTIPLO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "DAYCOVAL LEASING SOCIEDADE DE ARRENDAMENTO MERCANTIL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "DAYCOVAL REAL ESTATE CREDITO IMOBILIARIO I FII DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DAYCOVAL S.A - PRUDENCIAL", "PARTICIPANTE": "DAYCOVAL TESOURARIA FUNDO DE INVESTIMENTO FINANCEIRO EM INFRAESTRUTURA RENDA FIXA CP - RESP LIMTADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO EST. DE SE S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO DO ESTADO DE SERGIPE S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO DO EST. DE SE S.A. - PRUDENCIAL", "PARTICIPANTE": "BES CARD FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO EST. DE SE S.A. - PRUDENCIAL", "PARTICIPANTE": "BES FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO CRÉDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO EST. DE SE S.A. - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO MULTIMERCADO MERCATTO ATALAIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO EST. DE SE S.A. - PRUDENCIAL", "PARTICIPANTE": "MULVI FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO EST. DE SE S.A. - PRUDENCIAL", "PARTICIPANTE": "MULVI INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO DO NORDESTE DO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "VINCI CREDITO FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS INCENTIVADOS DE INVESTIMENTO EM INFRAESTRUTURA RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "VINCI CREDITO INFRA II MASTER FUNDO INCENTIVADO DE INVESTIMENTO EM INFRAESTRUTURA RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO DO NORDESTE DO BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "VINCI CREDITO INFRA MASTER FUNDO INCENTIVADO DE INVESTIMENTO EM INFRAESTRUTURA RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO FIBRA S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO FIBRA S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO FIBRA S.A. - PRUDENCIAL", "PARTICIPANTE": "FIBRA COMPANHIA SECURITIZADORA DE CREDITOS IMOBILIARIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO FIBRA S.A. - PRUDENCIAL", "PARTICIPANTE": "FIBRA EXA RED HEIFER TERRAS BRASIL I FIAGRO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO FIBRA S.A. - PRUDENCIAL", "PARTICIPANTE": "FIBRA GOLEM D360 FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO FINANCEIRO MULTIMERCADO CR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO GUANABARA S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO GUANABARA S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO GUANABARA S.A. - PRUDENCIAL", "PARTICIPANTE": "BG PEGASO EMPREENDIMENTO IMOBILIARIO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO GUANABARA S.A. - PRUDENCIAL", "PARTICIPANTE": "BGI ADMINISTRADORA DE RECURSOS DE TERCEIROS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO SUMITOMO MITSUI BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO SUMITOMO MITSUI BRASILEIRO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO SUMITOMO MITSUI BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "SMBCB OFFSHORE FUND I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO SUMITOMO MITSUI BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "SMBCB ONSHORE FIF MULTIMERCADO INVESTIMENTO NO EXTERIOR LONGO PRAZO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO TOYOTA DO BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO TOYOTA DO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO TOYOTA DO BRASIL S.A. - PRUDENCIAL", "PARTICIPANTE": "TOYOTA ADMINISTRADORA DE CONSÓRCIOS DO BRASIL LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BCO TRIANGULO S.A. - PRUDENCIAL", "PARTICIPANTE": "BANCO TRIANGULO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BCO TRIANGULO S.A. - PRUDENCIAL", "PARTICIPANTE": "TRIPAG MEIOS DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BD REGIONAL DO EXTREMO SUL - PRUDENCIAL", "PARTICIPANTE": "BANCO REGIONAL DE DESENVOLVIMENTO DO EXTREMO SUL", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BD REGIONAL DO EXTREMO SUL - PRUDENCIAL", "PARTICIPANTE": "BB POLO 27 FUNDO DE INVESTIMENTO RENDA FIXA LONGO PRAZO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BECKER FINANCEIRA S.A. - CFI - PRUDENCIAL", "PARTICIPANTE": "BECKER FINANCEIRA S.A. - CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BECKER FINANCEIRA S.A. - CFI - PRUDENCIAL", "PARTICIPANTE": "ADMINISTRADORA DE CONSÓRCIOS BECKER LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "BANCO BMG S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "ATACADO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "BANCO BMG CONSIGNADO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "BANCO BMG SOLUÇÕES FINANCEIRAS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "BMG LEASING S.A. ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "BMG S.A. DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS CARTOES CONSIGNADOS I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS CARTOES CONSIGNADOS II", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "RETAIL FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "ROMEU FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMG - PRUDENCIAL", "PARTICIPANTE": "VERT COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMP SCMEPP LTDA - PRUDENCIAL", "PARTICIPANTE": "BMP SOCIEDADE DE CRÉDITO AO MICROEMPREENDEDOR E A EMPRESA DE PEQUENO PORTE LTDA.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BMP SCMEPP LTDA - PRUDENCIAL", "PARTICIPANTE": "BMP SOCIEDADE DE CRÉDITO DIRETO S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMW - PRUDENCIAL", "PARTICIPANTE": "BMW FINANCEIRA S.A. - CREDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BMW - PRUDENCIAL", "PARTICIPANTE": "BMW ACQUISITIONS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BMW - PRUDENCIAL", "PARTICIPANTE": "BMW LEASING DO BRASIL S.A. - ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "BANCO NACIONAL DE DESENVOLVIMENTO ECONOMICO E SOCIAL", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "AGENCIA ESPECIAL DE FINANCIAMENTO INDUSTRIAL FINAME", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "BB GAIA FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "BB GAIA II FUNDO DE INVESTIMENTO EM COTAS DE FIF RF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "BB GAIA III RENDA FIXA FUNDO DE INVESTIMENTO EM COTAS DE FIF RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "BNDES PARTICIPACOES SA BNDESPAR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES CRIATEC CAPITAL SEMENTE - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES FIMA MULTIESTRATEGIA RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNDES - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTOS EM PARTICIPACOES MULTIESTRATEGIA NA AMAZONIA - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNP PARIBAS - PRUDENCIAL", "PARTICIPANTE": "BANCO BNP PARIBAS BRASIL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BNP PARIBAS - PRUDENCIAL", "PARTICIPANTE": "BNP PARIBAS BRASIL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNP PARIBAS - PRUDENCIAL", "PARTICIPANTE": "BNP PARIBAS PROPRIETÁRIO FI MULTIMERCADO CRÉDITO PRIVADO - INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BNY MELLON - PRUDENCIAL", "PARTICIPANTE": "BNY MELLON BANCO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BNY MELLON - PRUDENCIAL", "PARTICIPANTE": "BNY MELLON SERVIÇOS FINANCEIROS DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BOCOM - PRUDENCIAL", "PARTICIPANTE": "BANCO BOCOM BBM S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BOCOM - PRUDENCIAL", "PARTICIPANTE": "BOCOM BBM CORRETORA DE CÂMBIO E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BOCOM - PRUDENCIAL", "PARTICIPANTE": "HAITAN FUND", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BOCOM - PRUDENCIAL", "PARTICIPANTE": "JIANG FIF - CI MULTIMERCADO CREDITO PRIVADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BOCOM - PRUDENCIAL", "PARTICIPANTE": "TAI YANG FUND", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BOCOM - PRUDENCIAL", "PARTICIPANTE": "THE SOUTHERN ATLANTIC INVESTMENTS LTD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BOFA MERRILL LYNCH - PRUDENCIAL", "PARTICIPANTE": "BANK OF AMERICA MERRILL LYNCH BANCO MÚLTIPLO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BOFA MERRILL LYNCH - PRUDENCIAL", "PARTICIPANTE": "MERRILL LYNCH S.A. CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BR PARTNERS - PRUDENCIAL", "PARTICIPANTE": "BR PARTNERS BANCO DE INVESTIMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BR PARTNERS - PRUDENCIAL", "PARTICIPANTE": "BR PARTNERS CAPITAL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BR PARTNERS - PRUDENCIAL", "PARTICIPANTE": "TOTAL FUNDO DE INVESTIMENTO MULTIMERCADO INVESTIMENTO NO EXTERIOR - CRÉDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO BRADESCO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "AGORA GLOBAL SUSTAIN IS FIF - CI EM ACOES - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "ALPHA FIF RENDA FIXA REFERENCIADO DI CREDITO PRIVADO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "ALVORADA COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "ARANAU HOLDINGS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "B-INDEX ETF CONNECT CHINA AMC CHINEXT FUNDO DE INDICE - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "B-INDEX ETF CONNECT CHINA UNIVERSAL CSI 300 FUNDO DE INDICE - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO BRADESCARD S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO BRADESCO BBI S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO BRADESCO BERJ S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO BRADESCO FINANCIAMENTOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO DIGIO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO JOHN DEERE S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANCO LOSANGO S.A. - BANCO MÚLTIPLO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BANKPAR CONSULTORIA E SERVICOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BEC DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BEM - DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BITZ INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO ALOCACAO SISTEMATICA BRASIL FI FINANCEIRO - CIC RF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO AQUAMARINE INFRA ATIVO FIF - CIC RF INCENTIVADO DE INVESTIMENTO EM INFRA LP RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO ASPEN 2 FUNDO DE INVESTIMENTO EM COTAS DE FIF EM ACOES - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO ASSET LONG ONLY FI FINANCEIRO - CIC EM ACOES - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO ASSET SMALL CAPS FI FINANCEIRO - CIC EM ACOES - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO CARTEIRA ARROJADA FIF - CIC DE CI MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO CARTEIRA MODERADA FIF - CLASSE  DE INVESTIMENTO EM COTAS MULT - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO CDI MAIS FI FINANCEIRO - CI MULT CRED PRIV - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO CDI MAIS II FIF - CLASSE DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO CONSERVATIVE FI FINANCEIRO - CI MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO DANA FIF - CLASSE DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO DANUBIO JUROS E MOEDAS FI FINANCEIRO - CIC MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO DEBENTURES INCENTIVADAS CDI III FIF - CIC RF DE INVESTIMENTO EM INFRA LP - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FC DE FIF RF CRED PRIV BONDS CORPORATIVOS BRASIL BRL - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FIF - CLASSE DE INVESTIMENTO EM ACOES IS SUSTENTABILIDADE EMPRESARIAL - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO RENDA FIXA GALÁXIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FUNDO DE INVESTIMENTO MULTIMERCADO CRÉDITO PRIVADO INVESTIMENTO NO EXTERIOR ANDRâMEDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FUNDO DE INVESTIMENTO MULTIMERCADO PIONEIRO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FUNDO DE INVESTIMENTO REFERENCIADO DI PERFORMANCE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FUNDO DE INVESTIMENTO REFERENCIADO DI UNIÇO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO HOLDING DE INVESTIMENTOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO IDKA IPCA 2 FI FINANCEIRO - CIC RF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO IDKA IPCA 5 FI FINANCEIRO - CIC RF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO IDKA PRE 5 FI FINANCEIRO - CIC RF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO LEASING S.A. - ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO MAN AHL SISTEMATICO GLOBAL INVESTIMENTO NO EXTERIOR BRL FIF - CIC MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO MERCURIUS FIF - CIC MULTIMERCADO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO MULTIGESTORES SIRIUS FI FINANCEIRO - CIC MULT CRED PRIV - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO PARTICIPACOES FINANCEIRAS SA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO PORTFOLIO INSTITUCIONAL FIF - CIC EM ACOES - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO PORTFOLIO INSTITUCIONAL FIF - CIC MULTIMERCADO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO RF GLOBAL FIF - CI MULTIMERCADO CREDITO PRIVADO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO RFI FI FINANCEIRO - CI MULT CRED PRIV - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO RV - GLOBAL FI FINANCEIRO - CI MULT CRED PRIV - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO RV LOCAL FI FINANCEIRO - CI MULT CRED PRIV - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO S.A. CORRETORA DE TITULOS E VALORES MOBILIARIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO SOBERANO INSTITUCIONAL FIF - CIC RENDA FIXA REFERENCIADO DI - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRADESCO-KIRTON CORRETORA DE CÂMBIO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRAM ENDURANCE FI FINANCEIRO - CI MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRAM GLOBAL INVESTMENT FUND SPC - COVERAGE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRAM IS SUSTENTABILIDADE EMPRESARIAL 2 FIF - CIA - RESP LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRAM JUROS MOEDAS FI FINANCEIRO - CI MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "BRAM MERCURIUS FIF - CLASSE DE INVESTIMENTO MULT - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "CICLOS  IMOBILIARIOS FIF - CLASSE DE  INVESTIMENTO MULTIMERCADO CREDITO PRIVADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS RUBI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "CONEXAO VINLAND LONG BIAS FIF CLASSE DE INVESTIMENTO EM COTAS MULTIMERCADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "DAHLIA EQUITY HEDGE FUNDO DE INVESTIMENTO EM COTAS DE FIF MULTIMERCADO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "DIGGER FIDC - SEGMENTO DE RECEBÍVEIS COMERCIAIS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "F II - FIF - CLASSE DE INVESTIMENTO RENDA FIXA CREDITO PRIVADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS COMPLEMENTAR  AUTO-FORD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO FINANCEIRO RF SIMPLES BCSF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO REFERENCIADO DI GJ", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "GJ BRA FI FINANCEIRO - CI RF REFERENCIADA DI - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "HSBC FICFI EM AÇåES IBOVESPA REGIMES DE PREVIDÒNCIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "HSBC PROCYON FUND LTD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "IMMOB I FUNDO DE INVESTIMENTO IMOBILIARIO - FII", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "IMMOB III FUNDO DE INVESTIMENTO IMOBILIARIO - FII", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "IMMOB V DESENVOLVIMENTO FUNDO DE INVESTIMENTO IMOBILIARIO - FII", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "ITAPEVA RECUPERACAO DE CREDITOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "KIRTON BANK S.A. - BANCO MÚLTIPLO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "LECCE HOLDINGS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "NEXT FIF - CIC DE ACOES IBOVESPA - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "NOVA MARILIA ADMINISTRACAO DE BENS MOVEIS E IMOVEIS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "PRODHOS FIF - CLASSE DE INVESTIMENTO RENDA FIXA INCENTIVADO DE INVESTIMENTO EM INFRAESTRUTURA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "PROPP I FUNDO DE INVESTIMENTO IMOBILIARIO - FII", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "PROPP II FUNDO DE INVESTIMENTO IMOBILIARIO - FII", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "RCB INVESTIMENTOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "RCB PORTFOLIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "REPASSES FINANCEIROS E SOLUCOES TECNOLOGICAS INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "SEREL PARTICIPACOES EM IMOVEIS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "TEMPO SERVICOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "TIVIO CAPITAL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "TIVIO GENESIS FIF - CLASSE DE INVESTIMENTO MULTIMERCADO CRED PRIV - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "TIVIO INSTITUCIONAL INCENTIVADO CDI 30 FIF - CIC RF REF DE INVESTIMENTO EM INFRA - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "TIVIO INSTITUCIONAL INCENTIVADO CDI MASTER FIF - CI RF REF DE INVESTIMENTO EM INFRA - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "VINLAND DEBENTURE INCENTIVADO 3 FIF INC EM INV EM DEB DE INFRA RF ATIVO CRED PRIV LP RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "ÁGORA CORRETORA DE TITULOS E VALORES MOBILIARIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRADESCO - PRUDENCIAL", "PARTICIPANTE": "KARTRA PARTICIPACOES LTDA.", "TIPO": "HOLDINGNÃOIF"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "BRB - BANCO DE BRASILIA S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "AXIA FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "BOULIAC FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "BRB - CREDITO, FINANCIAMENTO E INVESTIMENTO S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "BRB - DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS SA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "BRB VENTURE CAPITAL FUNDO DE INVESTIMENTO EM PARTICIPACOES CAPITAL SEMENTE RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "CARTAGO FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "CARTAO BRB S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "CMX REALTY III FUNDO DE INVESTIMENTO IMOBILIARIO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "JEITTO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "KYRA FUNDO DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "LOTUS FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "NAPLES FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "QUIRON FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "SH II FUNDO DE INVESTIMENTO EM PARTICIPAÇÕES MULTIESTRATÉGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "STRELITZIA FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "SUPREME REALTY FUNDO DE INVESTIMENTO IMOBILIARIO - FII", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "TESSALIA FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "TEXAS I FUNDO DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "TREVI FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BRB - PRUDENCIAL", "PARTICIPANTE": "YVRAC FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BS2 - PRUDENCIAL", "PARTICIPANTE": "BANCO BS2 S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BS2 - PRUDENCIAL", "PARTICIPANTE": "ADIQPLUS INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BS2 - PRUDENCIAL", "PARTICIPANTE": "BS2 PAYMENTS INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BS2 - PRUDENCIAL", "PARTICIPANTE": "OPERA FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS MULTISETORIAL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BANCO BTG PACTUAL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BOREAS - SERIES B", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "ATIVOS ESTRATÉGICOS LOCAIS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BANCO BESA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BANCO NACIONAL DE INVESTIMENTOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BANCO NACIONAL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BANCO PAN S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BANCO SISTEMA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BLACKHAWK EMERGING MARKETS FUNDO DE INVESTIMENTO FINANCEIRO  MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BONA FIDE COLOMBIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BOREAS - SERIES A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BOREAS - SERIES C", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BOREAS - SERIES D", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BRAZILIAN SECURITIES COMPANHIA DE SECURITIZACAO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG CLAVE ALPHA MACRO III FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FI MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG CLAVE ALPHA MACRO MASTER FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG CONSÓRCIOS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS II", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG EMPRESAS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL AAA CORPORATE OFFICE FUND FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL ABSOLUTE RETURN MASTER FUND LP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL ASSET MANAGEMENT S.A. DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL BANCORP LLC", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL BDR INSTITUCIONAL FUNDO DE INVESTIMENTO FINANCEIRO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL CHILE S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL CHILE SPA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL CONSIGNADOS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL CONSIGNADOS II FUNDO DE INVESTIMENTO EM DIREITOS  CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL E3 FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL EMPRESAS FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL ENERGIA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL FOCUS FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL FONDO ALFA CONCENTRADO, S.A. DE C.V", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL GLOBAL FUND LP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL HOLDING INTERNACIONAL S A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL INT LO FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL INTERNATIONAL PORT FUND SPC - SP I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL INTERNATIONAL PORTFOLIO FUND SPC CLASS C", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL LONG TERM FUNDO DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL LONG TERM FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL LONGHORN HOLDINGS LP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL MULTIESTRATEGIA FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL NOTUS CREDIT FUND L.P.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL RED FIP - MULTIESTRATEGIA INVESTIMENTO NO EXTERIOR RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SERVIÇOS FINANCEIROS S.A. DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SMART OPPORTUNITIES FUNDO DE INVESTIMENTO FINANCEIRO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SMLL B3 FUNDO DE INDICE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SOLUCIONES Y SERVICIOS S.A.S.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL STRATEGIC CAPITAL FUND A, L.P", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SYNERGY LONG BIAS FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SYNERGY LONG ONLY FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL SYNERGY LONG ONLY PREVIDENCIA FIFE FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL TEVA ETHEREUM FUNDO DE INDICE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL TOTAL FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FI FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL TOTAL FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL TOTAL MACRO FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL US DIRECT LENDING LP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL US PRIVATE CREDIT INVESTIMENTS LP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL VOLT FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "BTG PACTUAL, S.A. DE C.V., SOFOM, E.N.R.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA ETF IBOVESPA FUNDO DE INDICE - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CALPINE II PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CALPINE PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CANUMA CAPITAL MULTIESTRATEGIA FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CANUMA CAPITAL USA REITS DOLAR FI FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CANUMA CAPITAL USA REITS DOLAR MASTER FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CANUMA CAPITAL USA REITS EM REAIS FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CETERI - FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO --- CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CL VI FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CL VII FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CLAVE ALPHA MACRO ACCESS FI FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CLAVE ALPHA MACRO P FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CLAVE TOTAL RETURN FI FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO ACCESS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 1 PRE FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 10 FUNDO DE INVESTIMENTO FINANCEIRO RENDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 11 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 12 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 13 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 14 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 6 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 7 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 8 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE 9 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE2 PRE FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE3 PRE FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE4 PRE FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "COE5 FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CONSIGNADO DELTA RECEIVABLES I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CP LS III FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "CP LS IV FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "ENGELHART CTP GNO (SWITZERLAND) SA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "ENGELHART CTP GROUP S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "EXES CREDITO DIRETO II FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FCP STATUM COMPARTIMENTO IV BPAC", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FGTS I FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FIP DEVELOPMENT FUNDO WAREHOUSE - MULTIESTRATEGIA INVESTIMENTO NO EXTERIOR RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FONDO DE CAPITAL -PRIVADO- BPACSI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FONDO DE CAPITAL PRIVADO DE STATUM", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FORD II PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FORD III PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FORD PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FORD USD FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE CAPITAL PRIVADO BPAC AEC", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITORIOS DO SETOR ELETRICO - INVESTIMENTO EM COTAS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS ALTERNATIVE ASSETS I RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS ALTERNATIVE ASSETS III RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS ALTERNATIVE ASSETS IV - E", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS COMERCIAIS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS CRÉDITOS NÃO PADRONIZADOS I RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS INSOLVÊNCIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS MT I RECEIVABLES RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS PRECATÓRIOS BRASIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SETOR PÚBLICO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SPECIAL SITUATIONS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES BEIRA RIO - MULTIESTRATEGIA INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO LT", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO VITORIA FIDELIS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO MULTIMERCADO CRÉDITO PRIVADO LS INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO MULTIMERCADO NOOR PROVIDENTIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "G5 SEA FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "GALAPAGOS TEVA TESOURO SELIC FUNDO DE INDICE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "IG4 BTG PACTUAL HEALTH INFRA FIP MULTIESTRATEGIA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "INVESCO GREATER CHINA EQUITY DOLAR FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "INVESCO GREATER CHINA EQUITY FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "JANUS HENDERSON HORIZON BIOTECHNOLOGY FUNDO DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "JV BTG SENIOR SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "KAGR FUNDO DE INVESTIMENTO NAS CADEIAS PRODUTIVAS DO AGRONEGÓCIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "KATETO II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "KATETO INVESTIMENTO PRECATÓRIOS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "LEOPARD FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "LOFT I FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "LOFT II FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "LOFT III FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "MADEIRA FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "MAPFRE RENDA FIXA BP PREVIDENCIA FIC DE FIF RENDA FIXA - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "MT GLOBAL II FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "MT INSS RECEIVABLES II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PAN FINANCEIRA S.A. - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PEMEX PRE II FUNDO DE INVESTIMENTO RENDA FIXA CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PETBRA III FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PETBRA PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PETBRA PRE II FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PLATEAU II FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PLGN AUTO LOANS I FEEDER FI EM COTAS DE FUNDO DE INVESTIMENTO EM DIREITOS CREDITORIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PMX PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PORTFOLIO 22 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "PRIME OFFICES III FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "ROOFTOP II FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO COMPOUNDERS FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO LONG BIASED ACCESS FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FI MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO LONG BIASED FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO LONG BIASED MASTER FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO SELECTION ACCESS FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO SELECTION FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO DE ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "RYO SELECTION MASTER FUNDO DE INVESTIMENTO FINANCEIRO EM ACOES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SEEDLING FUNDO DE INVESTIMENTO EM PARTICIPACOES - MULTIESTRATEGIA IE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SG II A FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NÃO-PADRONIZADOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SORACHI FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SPRINGS EQUITY HEDGE FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCAD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SPRINGS EQUITY HEDGE MASTER FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SPRINGS TOTAL RETURN MASTER FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "SPRINGS TOTAL RETURN P FI FINANCEIRO EM COTAS DE FUNDOS DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "TRK PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "TRUXT I LONG SHORT FIF DA CLASSE DE INVESTIMENTO EM COTAS MULTIMERCADO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "US STEEL FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "US STEEL IV PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "US STEEL PRE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "US STEEL PRE II FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "US STEEL PRE III FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "VITREO DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "VV PRE FUNDO DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "ZETA FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BTG PACTUAL - PRUDENCIAL", "PARTICIPANTE": "ZETA FUNDO DE INVESTIMENTO NAS CADEIAS PRODUTIVAS DO AGRONEGOCIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BULLLA IP - PRUDENCIAL", "PARTICIPANTE": "BULLLA INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "BULLLA IP - PRUDENCIAL", "PARTICIPANTE": "BULLLA COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS SA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BULLLA IP - PRUDENCIAL", "PARTICIPANTE": "BULLLA FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BULLLA IP - PRUDENCIAL", "PARTICIPANTE": "BULLLA SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BULLLA IP - PRUDENCIAL", "PARTICIPANTE": "BULLLA SOCIEDADE DE EMPRÉSTIMO ENTRE PESSOAS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "BULLLA IP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS BULLLA CARTÕES RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA ECONOMICA FEDERAL", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA CARTOES HOLDING S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA EXTRAMERCADO EXCLUSIVO CORRETORA FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA EXTRAMERCADO EXCLUSIVO LOTERIAS FIF RENDA FIXA LONGO PRAZO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA EXTRAMERCADO EXCLUSIVO SEGURIDADE FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "CAIXA IBIRAPUERA FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - ACR IV", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "XS5 ADMINISTRADORA DE CONSÓRCIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA ECONÔMICA FEDERAL - PRUDENCIAL", "PARTICIPANTE": "ÂNIMA COOASGO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DO AGRONEGÓCIO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CAIXA GERAL - PRUDENCIAL", "PARTICIPANTE": "BANCO CAIXA GERAL - BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "CAIXA GERAL - PRUDENCIAL", "PARTICIPANTE": "CGD INVESTIMENTOS CORRETORA DE VALORES E CÂMBIO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CALCARD IP - PRUDENCIAL", "PARTICIPANTE": "CALCARD S.A. - INSTITUIÇÃO DE PAGAMENTOS", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CALCARD IP - PRUDENCIAL", "PARTICIPANTE": "CALCRED S.A. - CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CARTOS SCD - PRUDENCIAL", "PARTICIPANTE": "CARTOS SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "CARTOS SCD - PRUDENCIAL", "PARTICIPANTE": "VECKTRA MEIOS E PAGAMENTOS FINANCEIROS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CELCOIN IP - PRUDENCIAL", "PARTICIPANTE": "CELCOIN INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CELCOIN IP - PRUDENCIAL", "PARTICIPANTE": "GALAX PAY INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CELCOIN IP - PRUDENCIAL", "PARTICIPANTE": "VIA CAPITAL - SOCIEDADE DE CRÉDITO DIRETO S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "CIELO S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "BB CORAL FUNDO DE INVESTIMENTO EM COTAS FIF RENDA FIXA LONGO PRAZO CRED PRIV RESPONSABILIDADE LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FIF - CIC RF CRED PRIVADO PEGASUS - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "CATENO GESTAO DE CONTAS DE PAGAMENTO S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "CIELO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "CIELO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NÃO-PADRONIZADOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CIELO IP - PRUDENCIAL", "PARTICIPANTE": "STELO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CITIBANK - PRUDENCIAL", "PARTICIPANTE": "BANCO CITIBANK S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "CITIBANK - PRUDENCIAL", "PARTICIPANTE": "CITIBANK DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CITIBANK - PRUDENCIAL", "PARTICIPANTE": "CITIBANK N.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CITIBANK - PRUDENCIAL", "PARTICIPANTE": "CITIGROUP GLOBAL MARKETS BRASIL, CORRETORA DE CÂMBIO, TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CITIBANK - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO REFERENCIADO DI LONDRES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK INSTITUIÇÃO DE PAGAMENTO E SERVICOS LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK A.I. FUNDO  DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK AKIRA I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK AKIRA II FIDC SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK BELA FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK BIG PICTURE I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK BIG PICTURE II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK BIG PICTURE III FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK BIG PICTURE IV FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK FINANCEIRA S.A. CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK KICK ASS I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CLOUDWALK IP - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK PI FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS  SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "COBUCCIO SCFI - PRUDENCIAL", "PARTICIPANTE": "COBUCCIO S/A - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTOS", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "COBUCCIO SCFI - PRUDENCIAL", "PARTICIPANTE": "BOLT CARD INSTITUIÇÃO DE PAGAMENTOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "COBUCCIO SCFI - PRUDENCIAL", "PARTICIPANTE": "BRASIL CARD INSTITUIÇÃO DE PAGAMENTOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "COBUCCIO SCFI - PRUDENCIAL", "PARTICIPANTE": "COBUCCIO MASTER FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DE CLASSE ÚNICA FECHADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "COBUCCIO SCFI - PRUDENCIAL", "PARTICIPANTE": "COBUCCIO SECURITIZADORA DE CREDITOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CODEPE CORRETORA DE VAL. S.A. - PRUDENCIAL", "PARTICIPANTE": "CODEPE CORRETORA DE VALORES E CÂMBIO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "CODEPE CORRETORA DE VAL. S.A. - PRUDENCIAL", "PARTICIPANTE": "ÓTIMO SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "COOPER CARD IP - PRUDENCIAL", "PARTICIPANTE": "COOPER CARD INSTITUIÇÃO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "COOPER CARD IP - PRUDENCIAL", "PARTICIPANTE": "COOPER BENEFICIOS INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "COOPER CARD IP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS COOPER CARD II - CRÉDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREDI SHOP S.A. - PRUDENCIAL", "PARTICIPANTE": "CREDI-SHOP S/A - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CREDI SHOP S.A. - PRUDENCIAL", "PARTICIPANTE": "CREDI-SHOP - SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREDIARE CFI - PRUDENCIAL", "PARTICIPANTE": "CREDIARE S.A. - CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CREDIARE CFI - PRUDENCIAL", "PARTICIPANTE": "FARROUPILHA ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREDIARE CFI - PRUDENCIAL", "PARTICIPANTE": "JOSEMA ADMINISTRACAO E PARTICIPACOES S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREDIT AGRICOLE - PRUDENCIAL", "PARTICIPANTE": "BANCO CRÉDIT AGRICOLE BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "CREDIT AGRICOLE - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS MERCANTIS AUTO PEÇAS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREDIT AGRICOLE - PRUDENCIAL", "PARTICIPANTE": "ITU FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO EM DIREITOS CREDITORIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREDSYSTEM IP - PRUDENCIAL", "PARTICIPANTE": "CREDSYSTEM INSTITUIÇÃO DE PAGAMENTO LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "CREDSYSTEM IP - PRUDENCIAL", "PARTICIPANTE": "CREDSYSTEM SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREFISA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "CREFISA S.A.-CREDITO, FINANCIAMENTO E INVESTIMENTOS", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "CREFISA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "BANCO CREFISA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "CREFISA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "SEDONA SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "DM SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "DM INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "DM SECURITIZADORA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "DM SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "FORTBRASIL ALFA SECURITIZADORA S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "FORTBRASIL SECURITIZADORA S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DM SCFI - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS COMERCIAIS DE RESPONSABILIDADE LIMITADA FORTBRASIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "DOCK IP - PRUDENCIAL", "PARTICIPANTE": "DOCK INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "DOCK IP - PRUDENCIAL", "PARTICIPANTE": "DOCK SOLUCOES EM MEIOS DE PAGAMENTO S A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "EAGLE SCD - PRUDENCIAL", "PARTICIPANTE": "EAGLE SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "EAGLE SCD - PRUDENCIAL", "PARTICIPANTE": "EAGLE INSTITUICAO DE PAGAMENTO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "EDENRED SOLUCOES E IP AHA - PRUDENCIAL", "PARTICIPANTE": "EDENRED SOLUCOES E INSTITUICAO DE PAGAMENTO AHA S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "EDENRED SOLUCOES E IP AHA - PRUDENCIAL", "PARTICIPANTE": "EDENRED SOLUCOES DE MOBILIDADE E INSTITUICAO DE PAGAMENTO HU S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "EDENRED SOLUCOES E IP AHA - PRUDENCIAL", "PARTICIPANTE": "GREENPASS TECNOLOGIA E INSTITUICAO DE PAGAMENTO HUE S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "EDENRED SOLUCOES E IP AHA - PRUDENCIAL", "PARTICIPANTE": "REPOM INSTITUIÇÃO DE PAGAMENTO HUSA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "EFI S.A. IP - PRUDENCIAL", "PARTICIPANTE": "EFÍ S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "EFI S.A. IP - PRUDENCIAL", "PARTICIPANTE": "SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO EFÍ S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ENTREPAY IP - PRUDENCIAL", "PARTICIPANTE": "ENTREPAY INSTITUICAO DE PAGAMENTO S.A", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "ENTREPAY IP - PRUDENCIAL", "PARTICIPANTE": "ACQIO ADQUIRENCIA INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ENTREPAY IP - PRUDENCIAL", "PARTICIPANTE": "OCTA SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ENTREPAY IP - PRUDENCIAL", "PARTICIPANTE": "TMAQ 21 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DE ARRANJOS DE PAGAMENTO DE RESPONSABILIDADE L", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FACTA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "FACTA FINANCEIRA S.A. - CRÉDITO FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "FACTA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "321 SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FACTA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "RB CAPITAL CREDIT ALPHA STRATEGY I FIDC - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FATOR - PRUDENCIAL", "PARTICIPANTE": "BANCO FATOR S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "FATOR - PRUDENCIAL", "PARTICIPANTE": "FATOR FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FATOR - PRUDENCIAL", "PARTICIPANTE": "FATOR FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FATOR - PRUDENCIAL", "PARTICIPANTE": "FATOR HIGH YIELD FUNDO DE INVESTIMENTO EM DIREITOS CREDITORIOS MULTISSEGMENTOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FATOR - PRUDENCIAL", "PARTICIPANTE": "FATOR ORTHO FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO EM DIREITOS CREDITORIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FFCRED SCD - PRUDENCIAL", "PARTICIPANTE": "FFCRED SOCIEDADE DE CRÉDITO DIRETO S.A..", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "FFCRED SCD - PRUDENCIAL", "PARTICIPANTE": "F & F INSTITUICAO DE PAGAMENTO S. A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FFCRED SCD - PRUDENCIAL", "PARTICIPANTE": "FF ADMINISTRADORA DE CONSÓRCIO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FINAXIS - PRUDENCIAL", "PARTICIPANTE": "BANCO FINAXIS S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "FINAXIS - PRUDENCIAL", "PARTICIPANTE": "FINAXIS CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FINVEST DTVM - PRUDENCIAL", "PARTICIPANTE": "FINVEST DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "FINVEST DTVM - PRUDENCIAL", "PARTICIPANTE": "FINVEST CASH FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FISERV DO BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "FISERV DO BRASIL  INSTITUIÇÃO DE PAGAMENTO LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "FISERV DO BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "FISERV SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FISERV DO BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS FISERV - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FISERV DO BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "SLED S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "FITBANK IP - PRUDENCIAL", "PARTICIPANTE": "FITBANK INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "FITBANK IP - PRUDENCIAL", "PARTICIPANTE": "EASYCREDITO SOCIEDADE DE CREDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GAZINCRED SCFI - PRUDENCIAL", "PARTICIPANTE": "GAZINCRED S.A. SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "GAZINCRED SCFI - PRUDENCIAL", "PARTICIPANTE": "ADMINISTRADORA DE CONSORCIO NACIONAL GAZIN LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GENIAL - PRUDENCIAL", "PARTICIPANTE": "BANCO GENIAL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "GENIAL - PRUDENCIAL", "PARTICIPANTE": "GENIAL HORUS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GENIAL - PRUDENCIAL", "PARTICIPANTE": "GENIAL INSTITUCIONAL CORRETORA DE CÂMBIO, TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GENIAL - PRUDENCIAL", "PARTICIPANTE": "GENIAL INVESTIMENTOS CORRETORA DE VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GENIAL - PRUDENCIAL", "PARTICIPANTE": "PORTO - FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GENIAL - PRUDENCIAL", "PARTICIPANTE": "SUGOI FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GM - PRUDENCIAL", "PARTICIPANTE": "BANCO GM S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "GM - PRUDENCIAL", "PARTICIPANTE": "GMAC ADMINISTRADORA DE CONSORCIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "GOLDMAN SACHS - PRUDENCIAL", "PARTICIPANTE": "GOLDMAN SACHS DO BRASIL BANCO MULTIPLO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "GOLDMAN SACHS - PRUDENCIAL", "PARTICIPANTE": "GOLDMAN SACHS DO BRASIL CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HAITONG - PRUDENCIAL", "PARTICIPANTE": "HAITONG BANCO DE INVESTIMENTO DO BRASIL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "HAITONG - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO MULTIMERCADO TREASURY CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HAITONG - PRUDENCIAL", "PARTICIPANTE": "HAITONG DO BRASIL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HAITONG - PRUDENCIAL", "PARTICIPANTE": "HAITONG SECURITIES DO BRASIL CORRETORA DE CÂMBIO E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HAITONG - PRUDENCIAL", "PARTICIPANTE": "WESTERN STAR FUND LTD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HAITONG - PRUDENCIAL", "PARTICIPANTE": "HAITONG NEGOCIOS S.A.", "TIPO": "HOLDINGNÃOIF"},
+    {"CONGLOMERADO": "HONDA - PRUDENCIAL", "PARTICIPANTE": "BANCO HONDA S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "HONDA - PRUDENCIAL", "PARTICIPANTE": "ADMINISTRADORA DE CONSORCIO NACIONAL HONDA LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HONDA - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS AUTO-HONDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HONDA - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS MOTO-HONDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HONDA - PRUDENCIAL", "PARTICIPANTE": "HONDA LEASING S.A. - ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "HS FINANCEIRA - PRUDENCIAL", "PARTICIPANTE": "HS FINANCEIRA S/A CREDITO, FINANCIAMENTO E INVESTIMENTOS", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "HS FINANCEIRA - PRUDENCIAL", "PARTICIPANTE": "HS ADMINISTRADORA DE CONSÓRCIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "IFOOD PAGO IP - PRUDENCIAL", "PARTICIPANTE": "IFOOD PAGO INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "IFOOD PAGO IP - PRUDENCIAL", "PARTICIPANTE": "IFOOD PAGO CRÉDITO IV FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DE RESPONSABILIDADE  LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "IFOOD PAGO IP - PRUDENCIAL", "PARTICIPANTE": "IFOOD PAGO SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INDUSTRIAL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "BANCO INDUSTRIAL DO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "INDUSTRIAL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "INDUSTRIAL DO BRASIL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "BANCO INTER S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "INTER BASE FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS MULTISSETORIAL - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "INTER DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "INTER HEDGE FUNDO DE INVESTIMENTO IMOBILIARIO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "INTER OPORTUNIDADE IMOBILIARIA FUNDO DE INVESTIMENTO IMOBILIARIO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "INTER PAG INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "SPARK FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTER - PRUDENCIAL", "PARTICIPANTE": "TBI FUNDO DE INVESTIMENTO FINANCEIRO RENDA FIXA CREDITO PRIVADO LONGO PRAZO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "INTRA INVESTIMENTOS DTVM - PRUDENCIAL", "PARTICIPANTE": "INTRA INVESTIMENTOS DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "INTRA INVESTIMENTOS DTVM - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO MULTIMERCADO INTRADER BLACK THOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAÚ UNIBANCO HOLDING S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ANGICO FIDC SEGMENTO INFRAESTRUTURA E AGRONEGÓCIO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "AVENUE HOLDING FINANCEIRA LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "Acácia Fundo de Investimento em Direitos Creditórios Responsabilidade Limitada", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "B2CYCLE FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "BANCO INVESTCRED UNIBANCO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "BANCO ITAUBANK S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "BANCO ITAUCARD S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "BANCO ITAÚ CONSIGNADO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "BANCO ITAÚ VEÍCULOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "CARTÃO DE COMPRA SUPPLIER FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS II-RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK AKIRA I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "CLOUDWALK KICK ASS I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "CRÉDITO UNIVERSITÁRIO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "CRÉDITO UNIVERSITÁRIO IV FUNDO DE INVESTIMENTO EM DIREITOS  CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "DIBENS LEASING S.A. ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "FINANCEIRA ITAÚ CBD S.A. CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "FORTALEZA FUNDO DE INVESTIMENTO IMOBILIARIO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NÃO PADRONIZADOS NPL II", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "IA FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "IA II - FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "IDEAL CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "IDEAL HOLDING FINANCEIRA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "INTRAG DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "IRESOLVE COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU CORRETORA DE VALORES S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU ISENTO JULHO 28 FIC DE FUNDOS INCENTIVADOS DE INV FINANCEIRO EM INFRA RF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU ISENTO MARCO 28 FUNDO DE INVESTIMENTO EM COTAS DE FIIF EM INFRA RF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU ISENTO MARCO 29 FUNDO DE INVESTIMENTO EM COTAS DE FIIF EM INFRA RF - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU ISENTO SETEMBRO 28 FUNDO DE INVESTIMENTO EM COTAS DE FIIF EM INFRA RF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU ISENTO SETEMBRO 29 FIC DE FUNDOS INCENTIVADOS DE INV FINANCEIRO EM INFRA RF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU KINEA PRIVATE EQUITY MULTIMERCADO FIF CIC CREDITO PRIVADO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU VENTURES FIP MULTIESTRATEGIA INVESTIMENTO NO EXTERIOR RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAU-BBA TRADING S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAUBA FUNDO INCENTIVADO DE INVESTIMENTO FINANCEIRO EM INFRAESTRUTURA RENDA FIXA RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAÚ ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAÚ BBA TRADING S.A. - SUCURSAL URUGUAY", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAÚ UNIBANCO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITAÚ UNIBANCO VEÍCULOS ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "ITB HOLDING LTD", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "KINEA CO-INVESTIMENTO  FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "KINEA EQUITY INFRA I WAREHOUSE FEEDER MULTIMERCADO FIF CIC CRED PRIV RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "KINEA FOF IMOB INSTITUCIONAL FUNDO DE INVESTIMENTO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "KINEA I PRIVATE EQUITY FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "KINEA KP FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CREDITO PRIVADO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "KIWIFY FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILIDADE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "LICANIA FUND LIMITED", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "LUIZACRED S.A. SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "MICROINVEST S.A. SOCIEDADE DE CRÉDITO A MICROEMPREENDEDOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "MOBILITAS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "NC 2025 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "NC 2025 I FUNDO DE INVESTIMENTO  EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "OCA DINERO ELECTRÓNICO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "OITI FIF MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "PONT SOCIEDAD ANÓNIMA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "PRAVALER CRÉDITO UNIVERSITÁRIO II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESP LIMITADAL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "REDECARD INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "REDECARD SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "SCALA CURTO PRAZO- FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "SOULPAY FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "SUMUP SMART IV FIDC SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "SUMUP SOLO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "TANGERINA FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "TARUMA FIF FUNDO INCENTIVADO EM INVESTIMENTO EM DEBENTURES DE INFRA RF CRED PRIV RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "THEROS FUNDO DE INVESTIMENTO NAS CADEIAS PRODUTIVAS DO AGRONEGOCIO FIAGRO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "TOP 2025 I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "UNIBANCO AJ TÖTULOS PéBLICOS FUNDO DE INVESTIMENTO REFERENCIADO DI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "UNIBANCO DJ TÖTULOS PéBLICOS FUNDO DE INVESTIMENTO REFERENCIADO DI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ITAU - PRUDENCIAL", "PARTICIPANTE": "VITEX FIF FUNDO INCENTIVADO EM INVESTIMENTO EM DEBENTURES DE INFRA RF CRED PRIV RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "IUGU IP - PRUDENCIAL", "PARTICIPANTE": "IUGU INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "IUGU IP - PRUDENCIAL", "PARTICIPANTE": "IUGU I UR - FIDC - UNIDADE DE RECEBÍVEIS  RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "J17 SCD - PRUDENCIAL", "PARTICIPANTE": "J17 - SOCIEDADE DE CRÉDITO DIRETO S/A", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "J17 SCD - PRUDENCIAL", "PARTICIPANTE": "J17 - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "JP MORGAN CHASE - PRUDENCIAL", "PARTICIPANTE": "BANCO J.P. MORGAN S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "JP MORGAN CHASE - PRUDENCIAL", "PARTICIPANTE": "ATACAMA MULTIMERCADO - FUNDO DE INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "JP MORGAN CHASE - PRUDENCIAL", "PARTICIPANTE": "J.P. MORGAN CORRETORA DE CAMBIO E VALORES MOBILIARIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "JP MORGAN CHASE - PRUDENCIAL", "PARTICIPANTE": "J.P. MORGAN S.A. - DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "JP MORGAN CHASE - PRUDENCIAL", "PARTICIPANTE": "JPMORGAN CHASE BANK, NATIONAL ASSOCIATION", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "KANASTRA FINANCEIRA CFI - PRUDENCIAL", "PARTICIPANTE": "KANASTRA FINANCEIRA S.A, CREDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "KANASTRA FINANCEIRA CFI - PRUDENCIAL", "PARTICIPANTE": "K1 FUNDO DE INVESTIMENTO FINANCEIRO - CLASSE DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO - RESPONSA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "LEND SCD - PRUDENCIAL", "PARTICIPANTE": "LEND SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "LEND SCD - PRUDENCIAL", "PARTICIPANTE": "LEND INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MAF-BRL TRUST - PRUDENCIAL", "PARTICIPANTE": "BRL TRUST DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "MAF-BRL TRUST - PRUDENCIAL", "PARTICIPANTE": "MAF DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MAGALUPAY IP - PRUDENCIAL", "PARTICIPANTE": "MAGALUPAY INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MAGALUPAY IP - PRUDENCIAL", "PARTICIPANTE": "MAGALUPAY - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCADO BITCOIN - PRUDENCIAL", "PARTICIPANTE": "MERCANTIL DO BRASIL CORRETORA S.A. - CÂMBIO, TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MERCADO BITCOIN - PRUDENCIAL", "PARTICIPANTE": "MERCADO BITCOIN INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCADO PAGO IP - PRUDENCIAL", "PARTICIPANTE": "MERCADO PAGO INSTITUIÇÃO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MERCADO PAGO IP - PRUDENCIAL", "PARTICIPANTE": "MERCADO CRÉDITO SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCADO PAGO IP - PRUDENCIAL", "PARTICIPANTE": "MERCADO PAGO DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "BANCO MERCANTIL DO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "BANCO MERCANTIL DE INVESTIMENTOS S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "COSEFI - COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "MB BI FUNDO DE INVESTIMENTO IMOBILIARIO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "MERCANTIL DO BRASIL DISTRIBUIDORA S.A. - TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "MERCANTIL FINANCEIRA S.A. - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCANTIL DO BRASIL - PRUDENCIAL", "PARTICIPANTE": "OPEA SPE 01 COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MERCEDES-BENZ - PRUDENCIAL", "PARTICIPANTE": "BANCO MERCEDES-BENZ DO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "MERCEDES-BENZ - PRUDENCIAL", "PARTICIPANTE": "MERCEDES-BENZ LEASING DO BRASIL ARRENDAMENTO MERCANTIL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MONTE BRAVO CTVM - PRUDENCIAL", "PARTICIPANTE": "MONTE BRAVO CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MONTE BRAVO CTVM - PRUDENCIAL", "PARTICIPANTE": "ALLION FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MORGAN STANLEY - PRUDENCIAL", "PARTICIPANTE": "BANCO MORGAN STANLEY S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MORGAN STANLEY - PRUDENCIAL", "PARTICIPANTE": "CAIEIRAS FUNDO DE INVESTIMENTO MULTIMERCADO - INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MORGAN STANLEY - PRUDENCIAL", "PARTICIPANTE": "MORGAN STANLEY CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MORGAN STANLEY - PRUDENCIAL", "PARTICIPANTE": "MORGAN STANLEY DERIVATIVES PRODUCTS FUND", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MÉRITO DTVM - PRUDENCIAL", "PARTICIPANTE": "MÉRITO DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MÉRITO DTVM - PRUDENCIAL", "PARTICIPANTE": "MÉRITO SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MÊNTORE IP - PRUDENCIAL", "PARTICIPANTE": "MÊNTORE INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "MÊNTORE IP - PRUDENCIAL", "PARTICIPANTE": "MENTORE FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MÊNTORE IP - PRUDENCIAL", "PARTICIPANTE": "MENTORE II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "MÊNTORE IP - PRUDENCIAL", "PARTICIPANTE": "MENTORE SECURITIZADORA S A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "NEON PAGAMENTOS S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "C+ VALORA FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "CONSIGA MAIS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NEON FGTS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NEON UP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "NEON BLUE FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "NEON CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NEON PAGAMENTOS IP - PRUDENCIAL", "PARTICIPANTE": "NEON FINANCEIRA - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NG CASH IP - PRUDENCIAL", "PARTICIPANTE": "NG CASH INSTITUIÇÃO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "NG CASH IP - PRUDENCIAL", "PARTICIPANTE": "NG CASH SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NU PAGAMENTOS - PRUDENCIAL", "PARTICIPANTE": "NU PAGAMENTOS S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "NU PAGAMENTOS - PRUDENCIAL", "PARTICIPANTE": "MT INSS RECEIVABLES V FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS CONSIGNADOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NU PAGAMENTOS - PRUDENCIAL", "PARTICIPANTE": "NU FINANCEIRA S.A. - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NU PAGAMENTOS - PRUDENCIAL", "PARTICIPANTE": "NU INVESTIMENTOS S.A. - CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NU PAGAMENTOS - PRUDENCIAL", "PARTICIPANTE": "NUPAY FOR BUSINESS INSTITUICAO DE PAGAMENTO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NU PAGAMENTOS - PRUDENCIAL", "PARTICIPANTE": "RUBICON GLOBAL OPPORTUNITIES FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CP IE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "NVIO BRASIL BITSO IP - PRUDENCIAL", "PARTICIPANTE": "NVIO BRASIL BITSO INSTITUIÇÃO DE PAGAMENTO LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "NVIO BRASIL BITSO IP - PRUDENCIAL", "PARTICIPANTE": "NVIO BRASIL SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "OMNI S.A. - CREDITO FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "BIZ INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "FINSOL SOCIEDADE DE CRÉDITO AO MICROEMPREENDEDOR E À EMPRESA DE PEQUENO PORTE S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "INDEPENDENCIA PARTICIPACOES S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "MULTIBENS - COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "OMNI BANCO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "OMNI COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OMNI - PRUDENCIAL", "PARTICIPANTE": "OMNI S.A. ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ORIGINAL - PRUDENCIAL", "PARTICIPANTE": "BANCO ORIGINAL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "ORIGINAL - PRUDENCIAL", "PARTICIPANTE": "FLORA FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ORIGINAL - PRUDENCIAL", "PARTICIPANTE": "LAGUZ I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NÃO-PADRONIZADOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ORIGINAL - PRUDENCIAL", "PARTICIPANTE": "ORIGINAL FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ORIGINAL - PRUDENCIAL", "PARTICIPANTE": "ORIGINAL HUB LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ORIGINAL - PRUDENCIAL", "PARTICIPANTE": "ORIGINAL II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "OXY CH - PRUDENCIAL", "PARTICIPANTE": "OXY COMPANHIA HIPOTECÁRIA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "OXY CH - PRUDENCIAL", "PARTICIPANTE": "OXY DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGARE IP - PRUDENCIAL", "PARTICIPANTE": "PAGARE INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PAGARE IP - PRUDENCIAL", "PARTICIPANTE": "CHISEL VENTURE CAPITAL LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGARE IP - PRUDENCIAL", "PARTICIPANTE": "PAGARE SOCIEDADE DE CREDITO AO MICROEMPREENDEDOR E A EMPRESA DE PEQUENO PORTE LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGSEGURO - PRUDENCIAL", "PARTICIPANTE": "PAGSEGURO INTERNET INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PAGSEGURO - PRUDENCIAL", "PARTICIPANTE": "BANCOSEGURO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGSEGURO - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - PAGBANK MULTIADQUIRÊNCIA - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGSEGURO - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS PAGSEGURO I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGSEGURO - PRUDENCIAL", "PARTICIPANTE": "PAGINVEST CORRETORA DE TITULOS E VALORES MOBILIARIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGSEGURO - PRUDENCIAL", "PARTICIPANTE": "PAGSEGURO BIVA SECURITIZADORA DE CREDITOS FINANCEIROS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PAGUEVELOZ IP - PRUDENCIAL", "PARTICIPANTE": "PAGUEVELOZ INSTITUIÇÃO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PAGUEVELOZ IP - PRUDENCIAL", "PARTICIPANTE": "ENDURANCE FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PARANÁ BANCO - PRUDENCIAL", "PARTICIPANTE": "PARANÁ BANCO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "PARANÁ BANCO - PRUDENCIAL", "PARTICIPANTE": "4UM DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PICPAY - PRUDENCIAL", "PARTICIPANTE": "PICPAY INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PICPAY - PRUDENCIAL", "PARTICIPANTE": "CREDNOVO SOCIEDADE DE EMPRÉSTIMO ENTRE PESSOAS S. A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PICPAY - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS  PICPAY I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PICPAY - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS PICPAY FGTS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PICPAY - PRUDENCIAL", "PARTICIPANTE": "PICPAY BANK - BANCO MÚLTIPLO S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PICPAY - PRUDENCIAL", "PARTICIPANTE": "PICPAY INVEST DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINBANK BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "PINBANK BRASIL INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PINBANK BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "PINFINANCE HOLDING LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINBANK BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "PÓLOCRED   SOCIEDADE DE CRÉDITO AO MICROEMPREENDEDOR E À EMPRESA DE PEQUENO PORTE LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINBANK BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "PINBANK HOLDING S.A.", "TIPO": "HOLDINGNÃOIF"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "BANCO PINE S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "CHIMERA ALTERNATIVE ASSETS I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NP DE RESP. LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "ID GOIANA II FUNDO DE INVESTIMENTO FIAGRO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "LIFT CRÉDITO ESTRUTURADO I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "LIFT JS FIC DE FUNDOS DE INVESTIMENTO EM DIREITOS CREDITORIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "LIFT SO II FEEDER FUNDO DE INVESTIMENTO FINANCEIRO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "P3 DESENVOLVIMENTO IMOBILIARIO SPE LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "PINE INVESTIMENTOS DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PINE - PRUDENCIAL", "PARTICIPANTE": "SPRINGS EQUITY HEDGE B FUNDO DE INVESTIMENTO FINANCEIRO EM COTAS DE FI MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PLANNER - PRUDENCIAL", "PARTICIPANTE": "PLANNER CORRETORA DE VALORES S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "PLANNER - PRUDENCIAL", "PARTICIPANTE": "PLANNER SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PORTO SEGURO - PRUDENCIAL", "PARTICIPANTE": "PORTOSEG S.A. - CREDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PORTO SEGURO - PRUDENCIAL", "PARTICIPANTE": "PORTO SEGURO ADMINISTRADORA DE CONSÓRCIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PORTO SEGURO - PRUDENCIAL", "PARTICIPANTE": "PORTO SEGURO PRUDENCIAL RENDA FIXA REFERENCIADO DI FUNDO DE INVESTIMENTO FINANCEIRO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PORTO SEGURO - PRUDENCIAL", "PARTICIPANTE": "PORTOPAR DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "PROVER PROMOCAO DE VENDAS IP - PRUDENCIAL", "PARTICIPANTE": "PROVER PROMOCAO DE VENDAS INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "PROVER PROMOCAO DE VENDAS IP - PRUDENCIAL", "PARTICIPANTE": "LOAN BRASIL SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "QI SCD - PRUDENCIAL", "PARTICIPANTE": "QI SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "QI SCD - PRUDENCIAL", "PARTICIPANTE": "QI CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "QISTA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "QISTA S.A. - CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "QISTA S.A. CFI - PRUDENCIAL", "PARTICIPANTE": "REAG QISTA CASH FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RANDON - PRUDENCIAL", "PARTICIPANTE": "BANCO RANDON S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "RANDON - PRUDENCIAL", "PARTICIPANTE": "FIDC RANDONCORP SEGMENTO RECEBÍVEIS COMERCIAIS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RANDON - PRUDENCIAL", "PARTICIPANTE": "RANDON ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "REAG IP - PRUDENCIAL", "PARTICIPANTE": "REAG IP S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "REAG IP - PRUDENCIAL", "PARTICIPANTE": "REAG IP CASH FUNDO DE INVESTIMENTO FINANCEIRO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RECARGAPAY IP - PRUDENCIAL", "PARTICIPANTE": "RECARGAPAY INSTITUICAO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "RECARGAPAY IP - PRUDENCIAL", "PARTICIPANTE": "RECARGAPAY FUNDO DE INVESTIMENTO EM DIREITOS  CREDITÓRIOS EMPRÉSTIMOS I", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RECARGAPAY IP - PRUDENCIAL", "PARTICIPANTE": "RECARGAPAY I FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RECARGAPAY IP - PRUDENCIAL", "PARTICIPANTE": "RP FINANCEIRA S.A. - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RENDIMENTO - PRUDENCIAL", "PARTICIPANTE": "BANCO RENDIMENTO S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "RENDIMENTO - PRUDENCIAL", "PARTICIPANTE": "ACTION EMPREENDIMENTOS E PARTICIPACOES LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RENDIMENTO - PRUDENCIAL", "PARTICIPANTE": "COTACAO SERVICOS FINANCEIROS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RENDIMENTO - PRUDENCIAL", "PARTICIPANTE": "N26 SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RENDIMENTO - PRUDENCIAL", "PARTICIPANTE": "RENDIMENTO DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RENDIMENTO - PRUDENCIAL", "PARTICIPANTE": "RENDIMENTOPAY INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "BANCO RODOBENS S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "BRADESCO FIF - CLASSE DE INVESTIMENTO RF CRED PRIVADO VR - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "BRQUALY ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "CNF - ADMINISTRADORA DE CONSÓRCIOS NACIONAL LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "CONBR ADMINISTRADORA DE CONSÓRCIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "FLOREAL 1918 FUNDO DE  INVESTIMENTO RENDA FIXA CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "PORTOBENS ADMINISTRADORA DE CONSORCIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "RDBS CLASSE DE INVESTIMENTO RENDA FIXA CREDITO  PRIVADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "RODOBENS ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "RODOBENS - PRUDENCIAL", "PARTICIPANTE": "RODOBENS BRASIL PARTICIPACOES, EMPREENDIMENTOS E NEGOCIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "BANCO SAFRA S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "ALFA ARRENDAMENTO MERCANTIL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "ALFA CORRETORA DE CAMBIO E VALORES MOBILIARIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "ANDROMEDA II FUNDO DE INVESTIMENTO FINANCEIRO CLASSE DE INVEST RENDA FIXA CURTO PRAZO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "ANDROMEDA III FIF CLASSE DE INVESTIMENTO RENDA FIXA CURTO PRAZO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "BANCO ALFA DE INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "BANCO ALFA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "BANCO J. SAFRA S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "ERIS FUNDO DE INVESTIMENTO FINANCEIRO CLASSE DE INVEST MULTIMERCADO CREDITO PRIVADO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "FINANCEIRA ALFA S.A. - CRÉDITO, FINANCIAMENTO E INVESTIMENTOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "JS COMPANHIA SECURITIZADORA DE CREDITOS FINANCEIROS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "JUPITER FUNDO DE INVEST MULTIMERCADO CREDIDO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "MARTE FUNDO DE INVESTIMENTO REFERENCIADO DI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "MERCURIO FI CURTO PRAZO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "MERCURIO II FIF CLASSE DE INVESTIMENTO RENDA FIXA CURTO PRAZO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRA ASSET CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRA CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRA DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRA LEASING S.A. ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRA PROPRIO FORMADOR DE MERCADO FIF CLASSE DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRA SOCIEDADE DE CREDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "SAFRAPAY INSTITUICAO DE PAGAMENTO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SAFRA - PRUDENCIAL", "PARTICIPANTE": "TRAPPIST FUNDO DE INVESTIMENTO FINANCEIRO CLASSE DE INVEST RENDA FIXA CREDITO PRIVADO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "BANCO SANTANDER (BRASIL) S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "AGRO FLEX FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "ARARINHA RENDA FIXA CREDITO PRIVADO - FUNDO DE INVESTIMENTO FINANCEIRO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "ATUAL - FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "BANCO BANDEPE S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "BANCO HYUNDAI CAPITAL BRASIL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "BANCO RCI BRASIL S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "D365 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "FIDC MULTISEGMENTOS NPL IPANEMA VI RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS ATACADO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS CONRETORNO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS TELLUS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "GETNET ADQUIRÊNCIA E SERVIÇOS PARA MEIOS DE PAGAMENTO S.A. INSTITUIÇÃO DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "GETNET FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "GETNET SOCIEDADE DE CREDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "HYUNDAI FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "PRECATO IV FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "RETURN CAPITAL GESTAO DE ATIVOS E PARTICIPACOES S A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SAINTE JULIE FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NÃO-PADRONIZADOS RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER AMAZONAS MULTIMERCADO CREDITO PRIVADO - FIF", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER BRASIL ADMINISTRADORA DE CONSÓRCIO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER DIAMANTINA MULTIMERCADO CREDITO PRIVADO - FIF", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER GUARUJA MULTIMERCADO CREDITO PRIVADO - FIF", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER HERA RENDA FIXA FUNDO INCENTIVADO DE INVESTIMENTO EM INFRAESTRUTURA RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER HERMES RENDA FIXA FUNDO INCENTIVADO DE INVESTIMENTO EM INFRAESTRUTURA - FIF", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER INSTITUCIONAL CORRETORA DE CÂMBIO E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER LEASING S.A. ARRENDAMENTO MERCANTIL", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER MODULO MX III RENDA FIXA REFERENCIADO DI CIC FIF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER MODULO SINQIA II RENDA FIXA REFERENCIADO DI - CIC FIF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER MODULO SINQIA III RENDA FIXA REFERENCIADO DI - CIC FIF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER MODULO SINQIA RENDA FIXA REFERENCIADO DI - CIC FIF RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER PARATY QIF", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER SBAC II RENDA FIXA CURTO PRAZO - FUNDO DE INVESTIMENTO FINANCEIRO RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "SANTANDER SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "TERRAS FUNDO DE INVESTIMENTO NAS CADEIAS PRODUTIVAS DO AGRONEGÓCIO - FIAGRO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SANTANDER - PRUDENCIAL", "PARTICIPANTE": "VENDA DE VEÍCULOS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SCANIA - PRUDENCIAL", "PARTICIPANTE": "SCANIA BANCO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SCANIA - PRUDENCIAL", "PARTICIPANTE": "SCANIA ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SCOTIABANK BRASIL - PRUDENCIAL", "PARTICIPANTE": "SCOTIABANK BRASIL S.A. BANCO MÚLTIPLO", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "SCOTIABANK BRASIL - PRUDENCIAL", "PARTICIPANTE": "SCOTIABANK BRASIL S.A. CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SEM PARAR IP - PRUDENCIAL", "PARTICIPANTE": "SEM PARAR INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SEM PARAR IP - PRUDENCIAL", "PARTICIPANTE": "SEM PARAR SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SENFFNET IP - PRUDENCIAL", "PARTICIPANTE": "SENFFNET INSTITUIÇÃO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SENFFNET IP - PRUDENCIAL", "PARTICIPANTE": "BANCO SENFF S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SENFFNET IP - PRUDENCIAL", "PARTICIPANTE": "CREDIFIX FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SHPP BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "SHPP BRASIL INSTITUIÇÃO DE PAGAMENTO E SERVIÇOS DE PAGAMENTOS LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SHPP BRASIL IP - PRUDENCIAL", "PARTICIPANTE": "MONEE SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SIMPALA CFI - PRUDENCIAL", "PARTICIPANTE": "SIMPALA S.A. CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SIMPALA CFI - PRUDENCIAL", "PARTICIPANTE": "SIMPALA LANÇADORA E ADMINISTRADORA DE CONSÓRCIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SINOSSERRA FINANCEIRA S/A - PRUDENCIAL", "PARTICIPANTE": "SINOSSERRA FINANCEIRA S/A - SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "SINOSSERRA FINANCEIRA S/A - PRUDENCIAL", "PARTICIPANTE": "SINOSSERRA ADMINISTRADORA DE CONSÓRCIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SOFISA - PRUDENCIAL", "PARTICIPANTE": "BANCO SOFISA S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SOFISA - PRUDENCIAL", "PARTICIPANTE": "SOFISA  CONSIGNADO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SOFISA - PRUDENCIAL", "PARTICIPANTE": "SOFISA RECEBÍVEIS FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SOFISA - PRUDENCIAL", "PARTICIPANTE": "SOFISA S.A. CRÉDITO, FINANCIAMENTO E INVESTIMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SRM BANK IP - PRUDENCIAL", "PARTICIPANTE": "SRM BANK INSTITUIÇÃO DE PAGAMENTO S/A", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SRM BANK IP - PRUDENCIAL", "PARTICIPANTE": "SRM DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STARK SCD - PRUDENCIAL", "PARTICIPANTE": "STARK SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "STARK SCD - PRUDENCIAL", "PARTICIPANTE": "STARK BANK S.A. - INSTITUICAO DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STELLANTIS - PRUDENCIAL", "PARTICIPANTE": "STELLANTIS FINANCIAMENTOS SOCIEDADE DE CRÉDITO, FINANCIAMENTO E INVESTIMENTO S.A", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "STELLANTIS - PRUDENCIAL", "PARTICIPANTE": "BANCO STELLANTIS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STELLANTIS - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS STELLANTIS MOBILITY I - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STELLANTIS - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS STELLANTIS MOBILITY II - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STELLANTIS - PRUDENCIAL", "PARTICIPANTE": "MOAB FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO RECEBÍVEIS COMERCIAIS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STELLANTIS - PRUDENCIAL", "PARTICIPANTE": "VITA AUTO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "STONE INSTITUIÇÃO DE PAGAMENTO S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS ACR I BANCOS EMISSORES DE CARTÃO DE CRÉDITO RESP LIMI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "MNLT S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "PAGAR.ME INSTITUICAO DE PAGAMENTO S.A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "SOMA III FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "STONE CARTOES INSTITUICAO DE PAGAMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "STONE DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "STONE PAY MEIOS DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "STONE SOCIEDADE DE CREDITO, FINANCIAMENTO E INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "STONE SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONE IP - PRUDENCIAL", "PARTICIPANTE": "TAPSO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "STONEX DTVM - PRUDENCIAL", "PARTICIPANTE": "STONEX DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "STONEX DTVM - PRUDENCIAL", "PARTICIPANTE": "BANCO STONEX S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP INSTITUICAO DE PAGAMENTO BRASIL LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "BRASIL MICROCRÉDITO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP I FIDC SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP SMART I FIDC SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP SMART II FIDC SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP SMART III FIDC SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "SUMUP IP - PRUDENCIAL", "PARTICIPANTE": "SUMUP SOLO FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS SEGMENTO MEIOS DE PAGAMENTO DE RESPONSABILI", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TERRA INVESTIMENTOS DTVM - PRUDENCIAL", "PARTICIPANTE": "TERRA INVESTIMENTOS DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "TERRA INVESTIMENTOS DTVM - PRUDENCIAL", "PARTICIPANTE": "MONETAR DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TRADERS DTVM - PRUDENCIAL", "PARTICIPANTE": "TRADERS DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "TRADERS DTVM - PRUDENCIAL", "PARTICIPANTE": "TC CASH FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TRINUS CAPITAL DTVM - PRUDENCIAL", "PARTICIPANTE": "TRINUS CAPITAL DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "TRINUS CAPITAL DTVM - PRUDENCIAL", "PARTICIPANTE": "TRINUS SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TRIO IP - PRUDENCIAL", "PARTICIPANTE": "TRIO INSTITUICAO DE PAGAMENTO LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "TRIO IP - PRUDENCIAL", "PARTICIPANTE": "TRIO HOLDING FINANCEIRA LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TRIO IP - PRUDENCIAL", "PARTICIPANTE": "TRIO SECURITIZADORA DE CREDITOS S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TRUSTEE/BANVOX - PRUDENCIAL", "PARTICIPANTE": "TRUSTEE DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "TRUSTEE/BANVOX - PRUDENCIAL", "PARTICIPANTE": "BANVOX DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "TULLETT PREBON BRASIL S.A. CTVM - PRUDENCIAL", "PARTICIPANTE": "TULLETT PREBON BRASIL CORRETORA DE VALORES E CÂMBIO LTDA", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "TULLETT PREBON BRASIL S.A. CTVM - PRUDENCIAL", "PARTICIPANTE": "ICAP DO BRASIL CORRETORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BANCO DE INVESTIMENTOS UBS (BRASIL) S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "BANCO UBS (BRASIL) S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "CREDIT SUISSE PROPRIO MARKET MAKER FUNDO DE INVESTIMENTO FINANCEIRO - MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "UBS (BRASIL) CORRETORA DE VALORES S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "UBS BB BANCO DE INVESTIMENTO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "UBS BB CORRETORA DE CÂMBIO, TÍTULOS E VALORES MOBILIÁRIOS S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "UBS BRAZIL ACCESS FUND LIMITED", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "UBS (BRASIL) - PRUDENCIAL", "PARTICIPANTE": "UBS PROPRIO FUNDO DE INVESTIMENTO FINANCEIRO - MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOLKSWAGEN - PRUDENCIAL", "PARTICIPANTE": "BANCO VOLKSWAGEN S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "VOLKSWAGEN - PRUDENCIAL", "PARTICIPANTE": "CONSÓRCIO NACIONAL VOLKSWAGEN - ADMINISTRADORA DE CONSÓRCIO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOLKSWAGEN - PRUDENCIAL", "PARTICIPANTE": "DRIVER BRASIL SIX BANCO VOLKSWAGEN FIDC FINANCIAMENTO DE VEÍCULOS - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOLKSWAGEN - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS DRIVER MASTER BRASIL I - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOLVO - PRUDENCIAL", "PARTICIPANTE": "BANCO VOLVO BRASIL S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "VOLVO - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS COMERCIAIS VIKING", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOLVO - PRUDENCIAL", "PARTICIPANTE": "VOLVO ADMINISTRADORA DE CONSÓRCIO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VORTX DTVM - PRUDENCIAL", "PARTICIPANTE": "VORTX DISTRIBUIDORA DE TITULOS E VALORES MOBILIARIOS LTDA.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "VORTX DTVM - PRUDENCIAL", "PARTICIPANTE": "VX PAVARINI DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VORTX DTVM - PRUDENCIAL", "PARTICIPANTE": "VÓRTX SOCIEDADE DE CRÉDITO DIRETO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "BANCO VOTORANTIM S.A.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "ACESSO SOLUÇÕES DE PAGAMENTO S.A. - INSTITUIÇÃO DE PAGAMENTO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "ACESSOPAR INVESTIMENTOS E PARTICIPACOES S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "BANCO BV S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "EXPERTISE FIF - CLASSE DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS TM II RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES BV - MULTIESTRATEGIA IE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES BV TECH MULTIESTRATEGIA IE RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "SAPERE FUNDO DE INVESTIMENTO FINANCEIRO - CLASSE DE RENDA FIXA INVESTIMENTO EM INFRA - RESP LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VOTORANTIM - PRUDENCIAL", "PARTICIPANTE": "TIVIO SECURITIES FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "VR - PRUDENCIAL", "PARTICIPANTE": "BANCO VR S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "VR - PRUDENCIAL", "PARTICIPANTE": "VR DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "WARREN CCVM LTDA - PRUDENCIAL", "PARTICIPANTE": "WARREN CORRETORA DE VALORES MOBILIÁRIOS E CÂMBIO LTDA.", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "WARREN CCVM LTDA - PRUDENCIAL", "PARTICIPANTE": "WARREN RENA DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "WESTERN UNION - PRUDENCIAL", "PARTICIPANTE": "BANCO WESTERN UNION DO BRASIL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "WESTERN UNION - PRUDENCIAL", "PARTICIPANTE": "WESTERN UNION CORRETORA DE CÂMBIO S.A.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "WISE BRASIL CC - PRUDENCIAL", "PARTICIPANTE": "WISE BRASIL CORRETORA DE CÂMBIO LTDA", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "WISE BRASIL CC - PRUDENCIAL", "PARTICIPANTE": "WISE BRASIL INSTITUICAO DE PAGAMENTO LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "BANCO XP S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "ASPIS FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO LONGO PRAZO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "AUREA EXTREMA LOGISTICA FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "BARI CAPITAL RENDA FUNDO DE INVESTIMENTO IMOBILIARIO - RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "CACTOS FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "CONSIGNADO PÚBLICO XP FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "CORPORATE SPRJ FUNDO DE INVESTIMENTO IMOBILIARIO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "CORRESPONDENTE BANQUEIRO XP FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS - RESP LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "CREDIT RESTRUCTURING FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "CREDIT RESTRUCTURING II FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "DAO CREDITO HIGH GRADE FUNDO DE INVESTIMENTO EM RENDA FIXA CREDITO PRIVADO LONGO PRAZO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "ENDOR FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA - INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "ER - FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "ER 2030 FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FALX FIF MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FIC AJ BETA FUNDO DE INVESTIMENTO EM COTAS DE DIREITOS CREDITORIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FRADE FUNDO DE INVESTIMENTO EM COTAS DE FUNDOS DE INVESTIMENTO EM DIREITOS CREDITÓRIOS NP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FRADE III FUNDO DE INVESTIMENTO EM COTAS DE FUNDO DE INVESTIMENTO MULTIMERCADO CRED PRIV IE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM COTAS MULTIMERCADO SOLAR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS FGTS VISION RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES CHARDONNAY CAPITAL SEMENTE", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPACOES NOVO HOTEL BOTAFOGO EMPRESAS EMERGENTES", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO EM PARTICIPAÇåES MONTECARLO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO IMOBILIARIO DESENVOLVIMENTO 1 MODALMAIS", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "FUNDO DE INVESTIMENTO IMOBILIARIO RIZA MALLS MASTER RESPONSABILIDADE  LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "GIANT ZARATHUSTRA CLASSIC FUNDO DE INVESTIMENTO EM COTAS MULTIMERCADO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "GIANT ZARATHUSTRA IV FUNDO DE INVESTIMENTO EM COTAS MULTIMERCADO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "GLADIUS FIF MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "HOME EQUITY MULTI FUNDO DE INVESTIMENTO EM DIREITOS CREDITÓRIOS RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "JAVELIN FIF MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "MACADAMIA FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "MM HEDGE ICON", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "MODALMAIS SUECIA FUNDO DE INVESTIMENTO EM COTAS MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "MODALMAIS SUECIA II FUNDO DE INVESTIMENTO EM COTAS MULTIMERCADO", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "NIMROD FIF MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "PLEIADES FUNDO DE INVESTIMENTO EM PARTICIPACOES MULTIESTRATEGIA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "SCORPIO FIF MULTIMERCADO CREDITO PRIVADO INVESTIMENTO NO EXTERIOR", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "SMF FUNDO DE INVESTIMENTO MULTIMERCADO CREDITO PRIVADO RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XP CASH M2 FUNDO DE INVESTIMENTO EM RENDA FIXA SIMPLES RESPONSABILIDADE LIMITADA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XP DISTRIBUIDORA DE TÍTULOS E VALORES MOBILIÁRIOS LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XP INVESTIMENTOS CORRETORA DE CÂMBIO,TÍTULOS E VALORES MOBILIÁRIOS S/A", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XP MULTISTRATEGY FUND SP", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XP NIX FUNDO DE INVESTIMENTO EM INFRAESTRUTURA RENDA FIXA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XP SERVIÇOS FINANCEIROS DTVM LTDA", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "XP - PRUDENCIAL", "PARTICIPANTE": "XPI ALESIA FUND SEGREGATED PORTFOLIO (BRAZIL INTERNATIONAL FUND SPC", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "YAMAHA MOTOR - PRUDENCIAL", "PARTICIPANTE": "BANCO YAMAHA MOTOR DO BRASIL S.A.", "TIPO": "LIDER"},
+    {"CONGLOMERADO": "YAMAHA MOTOR - PRUDENCIAL", "PARTICIPANTE": "YAMAHA ADMINISTRADORA DE CONSÓRCIO LTDA.", "TIPO": "PARTICIPANTE"},
+    {"CONGLOMERADO": "ZEMA CFI - PRUDENCIAL", "PARTICIPANTE": "ZEMA CRÉDITO, FINANCIAMENTO E INVESTIMENTO S/A", "TIPO": "LIDER/HOLDING"},
+    {"CONGLOMERADO": "ZEMA CFI - PRUDENCIAL", "PARTICIPANTE": "ZEMA ADMINISTRADORA DE CONSÓRCIO LTDA", "TIPO": "PARTICIPANTE"}
+    ];
+    let regMap = new Map();
+    let searchInput, autocompleteDiv, clearBtn, currentFocus = -1;
+
+    function normalizarTexto(str) {
+        return str.toString().toUpperCase()
+            .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+            .replace(/[^A-Z0-9 ]/g, " ").replace(/\s+/g, " ").trim();
+    }
+    function escapeHtml(str) {
+        if (!str) return '';
+        return str.replace(/[&<>"]/g, m => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':'&quot;'}[m]));
+    }
+    function highlightMatch(text, term) {
+        const normText = normalizarTexto(text);
+        const idx = normText.indexOf(term);
+        if (idx < 0) return escapeHtml(text);
+        return escapeHtml(text.slice(0, idx))
+            + '<mark>' + escapeHtml(text.slice(idx, idx + term.length)) + '</mark>'
+            + escapeHtml(text.slice(idx + term.length));
+    }
+    function getTipoBadge(tipo) {
+        const t = (tipo || '').toUpperCase();
+        if (t.includes('LIDER') && t.includes('HOLDING')) return {cls:'tipo-holding', label:'Líder/Holding'};
+        if (t.includes('LIDER'))   return {cls:'tipo-lider',   label:'★ Líder'};
+        if (t.includes('HOLDING')) return {cls:'tipo-holding', label:'Holding'};
+        return {cls:'tipo-part', label:'Participante'};
+    }
+
+    function rebuildMap() {
+        regMap.clear();
+        registros.forEach(r => {
+            const key = normalizarTexto(r.PARTICIPANTE);
+            regMap.set(key, r);
+        });
+    }
+
+    function updateStats() {
+        const total = registros.length;
+        const congs = new Set(registros.map(r => r.CONGLOMERADO)).size;
+        const lids  = registros.filter(r => r.TIPO.toUpperCase().includes('LIDER')).length;
+        document.getElementById('statsBar').innerHTML = `
+            <div class="stat-pill"><span class="dot dot-gold"></span>${total.toLocaleString('pt-BR')} participantes</div>
+            <div class="stat-pill"><span class="dot dot-blue"></span>${congs.toLocaleString('pt-BR')} conglomerados</div>
+            <div class="stat-pill"><span class="dot dot-green"></span>${lids.toLocaleString('pt-BR')} líderes</div>
+        `;
+    }
+
+    function renderDetalhes(reg) {
+        const resultCard = document.getElementById('resultCard');
+        const resultArea = document.getElementById('resultArea');
+        if (!reg) { resultArea.style.display = 'none'; return; }
+
+        const {cls, label} = getTipoBadge(reg.TIPO);
+        const siblings = registros.filter(r => r.CONGLOMERADO === reg.CONGLOMERADO);
+        const lider = siblings.find(r => r.TIPO.toUpperCase().includes('LIDER'));
+
+        const sibsHtml = siblings.map(s => {
+            const isSel = s.PARTICIPANTE === reg.PARTICIPANTE;
+            const isLid = s.TIPO.toUpperCase().includes('LIDER');
+            const {cls: sc} = getTipoBadge(s.TIPO);
+            return `<div class="sibling-row ${isSel ? 'selected' : ''}" data-p="${escapeHtml(s.PARTICIPANTE)}">
+                <div class="sib-dot ${isLid ? 'lider' : ''}"></div>
+                <div class="sib-name">${escapeHtml(s.PARTICIPANTE)}</div>
+                <span class="tipo-badge ${sc}">${getTipoBadge(s.TIPO).label}</span>
+            </div>`;
+        }).join('');
+
+        const liderInfo = (lider && lider.PARTICIPANTE !== reg.PARTICIPANTE)
+            ? ` &middot; Líder: <strong style="color:var(--gold)">${escapeHtml(lider.PARTICIPANTE)}</strong>` : '';
+
+        resultCard.innerHTML = `
+            <div class="result-header">
+                <div class="result-icon">🏦</div>
+                <div class="result-main">
+                    <div class="result-participante">${escapeHtml(reg.PARTICIPANTE)}</div>
+                    <div class="result-cong-label">Conglomerado Prudencial</div>
+                    <div class="result-cong-name">${escapeHtml(reg.CONGLOMERADO)}</div>
+                </div>
+                <div class="result-tipo"><span class="tipo-badge ${cls}">${label}</span></div>
+            </div>
+            <div class="siblings-label">${siblings.length} participante${siblings.length !== 1 ? 's' : ''} neste conglomerado${liderInfo}</div>
+            <div class="siblings-list">${sibsHtml}</div>
+        `;
+        resultArea.style.display = 'block';
+        resultCard.querySelectorAll('.sibling-row').forEach(el => {
+            el.addEventListener('click', () => {
+                const found = registros.find(r => r.PARTICIPANTE === el.dataset.p);
+                if (found) { searchInput.value = found.PARTICIPANTE; renderDetalhes(found); toggleClearBtn(); }
+            });
+        });
+    }
+
+    function setupAutocomplete() {
+        searchInput  = document.getElementById('searchInput');
+        autocompleteDiv = document.getElementById('autocompleteList');
+        clearBtn     = document.getElementById('clearSearchBtn');
+
+        function toggleClearBtn() { clearBtn.style.display = searchInput.value.length > 0 ? 'flex' : 'none'; }
+        searchInput.addEventListener('input', toggleClearBtn);
+        clearBtn.addEventListener('click', () => {
+            searchInput.value = ''; autocompleteDiv.style.display = 'none';
+            renderDetalhes(null); toggleClearBtn(); searchInput.focus(); currentFocus = -1;
+        });
+
+        searchInput.addEventListener('input', (e) => {
+            const term = normalizarTexto(e.target.value.trim());
+            if (term.length < 2) { autocompleteDiv.style.display = 'none'; currentFocus = -1; return; }
+            const matches = registros.filter(r => normalizarTexto(r.PARTICIPANTE).includes(term));
+            if (!matches.length) { autocompleteDiv.style.display = 'none'; return; }
+            autocompleteDiv.innerHTML = '';
+            matches.slice(0, 50).forEach((r, idx) => {
+                const div = document.createElement('div');
+                div.className = 'autocomplete-item';
+                div.dataset.index = idx;
+                const {cls, label} = getTipoBadge(r.TIPO);
+                div.innerHTML = `<div>
+                    <div class="ac-main">${highlightMatch(r.PARTICIPANTE, term)}</div>
+                    <div class="ac-cong">${escapeHtml(r.CONGLOMERADO)}</div>
+                </div><span class="tipo-badge ${cls}">${label}</span>`;
+                div.addEventListener('click', () => {
+                    searchInput.value = r.PARTICIPANTE;
+                    autocompleteDiv.style.display = 'none';
+                    renderDetalhes(r); toggleClearBtn(); currentFocus = -1;
+                });
+                autocompleteDiv.appendChild(div);
+            });
+            autocompleteDiv.style.display = 'block'; currentFocus = -1;
+        });
+
+        searchInput.addEventListener('keydown', (e) => {
+            const items = autocompleteDiv.querySelectorAll('.autocomplete-item');
+            if (!items.length) return;
+            if (e.key === 'ArrowDown') {
+                e.preventDefault(); currentFocus++;
+                if (currentFocus >= items.length) currentFocus = 0;
+                updateActiveItem(items, currentFocus);
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault(); currentFocus--;
+                if (currentFocus < 0) currentFocus = items.length - 1;
+                updateActiveItem(items, currentFocus);
+            } else if (e.key === 'Enter') {
+                e.preventDefault();
+                if (currentFocus >= 0 && items[currentFocus]) items[currentFocus].click();
+                else if (autocompleteDiv.style.display === 'block' && items.length > 0) items[0].click();
+            } else if (e.key === 'Escape') {
+                autocompleteDiv.style.display = 'none'; currentFocus = -1;
+            }
+        });
+        document.addEventListener('click', (e) => {
+            if (e.target !== searchInput && !autocompleteDiv.contains(e.target)) {
+                autocompleteDiv.style.display = 'none'; currentFocus = -1;
+            }
+        });
+        toggleClearBtn();
+    }
+
+    function updateActiveItem(items, focusIndex) {
+        items.forEach((item, idx) => {
+            if (idx === focusIndex) { item.classList.add('active'); item.scrollIntoView({block:'nearest', behavior:'smooth'}); }
+            else item.classList.remove('active');
+        });
+    }
+
+    // ── TOPBAR FUNCTIONS ──
+    function updateHubClock() {
+        const el = document.getElementById('hubClock');
+        if (!el) return;
+        const now = new Date();
+        el.textContent = now.toLocaleDateString('pt-BR', {weekday:'short', day:'2-digit', month:'short', year:'numeric'})
+            + ' · ' + now.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit', second:'2-digit'});
+    }
+    updateHubClock(); setInterval(updateHubClock, 1000);
+
+    function initHubTheme() {
+        const saved = localStorage.getItem('theme');
+        const btn   = document.getElementById('hubThemeBtn');
+        if (saved === 'light') { document.body.classList.add('light'); if(btn) btn.textContent = '☀️'; }
+        else { document.body.classList.remove('light'); if(btn) btn.textContent = '🌙'; }
+        if (btn) btn.addEventListener('click', () => {
+            if (document.body.classList.contains('light')) {
+                document.body.classList.remove('light'); localStorage.setItem('theme','dark'); btn.textContent = '🌙';
+            } else {
+                document.body.classList.add('light'); localStorage.setItem('theme','light'); btn.textContent = '☀️';
+            }
+        });
+    }
+    initHubTheme();
+
+    document.getElementById('hubBackBtn')?.addEventListener('click', () => {
+        if (window.self !== window.top) window.parent.postMessage({action:'hubNavigate', target:'home'}, '*');
+        else window.location.href = "https://pabloads2020-lang.github.io/Dashboard-Ferramentas-Integradas/";
+    });
+    document.getElementById('hubNewTabBtn')?.addEventListener('click', () => window.open(window.location.href, '_blank'));
+
+    (function() {
+        const meta = document.querySelector('meta[name="data-atualizacao"]');
+        const span = document.getElementById('dataAtualizacao');
+        if (meta && meta.content && span) span.textContent = '· Atualizado em ' + meta.content;
+    })();
+
+    // ── ADMIN ──
+    const adminBtn   = document.getElementById('adminBtn');
+    const modal      = document.getElementById('adminModal');
+    const cancelBtn  = document.getElementById('cancelModalBtn');
+    const adminPass  = document.getElementById('adminPassword');
+    const uploadArea = document.getElementById('uploadAreaModal');
+    const fileInput  = document.getElementById('adminFileInput');
+
+    adminBtn.addEventListener('click', () => { modal.style.display = 'flex'; adminPass.value = ''; uploadArea.style.display = 'none'; fileInput.value = ''; });
+    cancelBtn.addEventListener('click', () => { modal.style.display = 'none'; });
+    adminPass.addEventListener('input', (e) => { uploadArea.style.display = e.target.value === ADMIN_SENHA ? 'block' : 'none'; });
+    uploadArea.addEventListener('click', () => { if (adminPass.value === ADMIN_SENHA) fileInput.click(); });
+    fileInput.addEventListener('change', async (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        if (adminPass.value !== ADMIN_SENHA) { alert('Senha incorreta.'); fileInput.value = ''; return; }
+        try {
+            await processarExcelParaGerarHTML(file);
+            modal.style.display = 'none';
+        } catch(err) { alert('Erro: ' + err.message); }
+    });
+
+    function encontrarColunas(headers) {
+        const map = {
+            CONGLOMERADO: ['conglomerado'],
+            PARTICIPANTE: ['participante'],
+            TIPO:         ['tipo', 'participacao'],
+        };
+        let idx = {CONGLOMERADO:-1, PARTICIPANTE:-1, TIPO:-1};
+        for (let i = 0; i < headers.length; i++) {
+            const h = headers[i].toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g,"").trim();
+            for (let [campo, chaves] of Object.entries(map)) {
+                if (idx[campo] === -1 && chaves.some(c => h.includes(c))) idx[campo] = i;
+            }
+        }
+        return idx;
+    }
+
+    async function processarExcelParaGerarHTML(file) {
+        const data = await file.arrayBuffer();
+        const wb   = XLSX.read(data, {type:'array'});
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+        if (!rows || rows.length < 2) throw new Error('Planilha vazia');
+        const headers  = rows[0].map(c => c ? c.toString().trim() : '');
+        const colIndex = encontrarColunas(headers);
+        if (colIndex.CONGLOMERADO === -1 || colIndex.PARTICIPANTE === -1)
+            throw new Error('Colunas CONGLOMERADO e PARTICIPANTE não identificadas.');
+        const novos = [];
+        for (let i = 1; i < rows.length; i++) {
+            const row = rows[i];
+            const c = row[colIndex.CONGLOMERADO]?.toString().trim();
+            const p = row[colIndex.PARTICIPANTE]?.toString().trim();
+            const t = colIndex.TIPO >= 0 ? (row[colIndex.TIPO]?.toString().trim() || '') : '';
+            if (c && p) novos.push({CONGLOMERADO:c, PARTICIPANTE:p, TIPO:t});
+        }
+        if (!novos.length) throw new Error('Nenhum registro válido encontrado');
+        const novoHTML = await gerarHTMLComDados(novos);
+        const blob = new Blob([novoHTML], {type:'text/html'});
+        const url  = URL.createObjectURL(blob);
+        const a    = document.createElement('a');
+        a.href = url; a.download = 'conglomerados_atualizado.html'; a.click();
+        URL.revokeObjectURL(url);
+        alert('✅ Novo HTML gerado com ' + novos.length + ' participantes em ' + new Set(novos.map(r=>r.CONGLOMERADO)).size + ' conglomerados. Substitua o arquivo no servidor.');
+    }
+
+    function gerarHTMLComDados(dados) {
+        const linhas = dados.map(r =>
+            '    {"CONGLOMERADO": ' + JSON.stringify(r.CONGLOMERADO) + ', "PARTICIPANTE": ' + JSON.stringify(r.PARTICIPANTE) + ', "TIPO": ' + JSON.stringify(r.TIPO) + '}'
+        );
+        const novoArray = 'let registros = [\n' + linhas.join(',\n') + '\n    ];';
+        return fetch(location.href)
+            .then(r => r.text())
+            .then(fonte => {
+                const INICIO = 'let registros = [';
+                const FIM    = '];\n    let regMap';
+                const i1 = fonte.indexOf(INICIO);
+                const i2 = fonte.indexOf(FIM, i1);
+                if (i1 === -1 || i2 === -1) throw new Error('Marcadores de dados não encontrados no fonte.');
+                const agora = new Date().toLocaleString('pt-BR', {day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+                let resultado = fonte.slice(0, i1) + novoArray + '\n    let regMap' + fonte.slice(i2 + FIM.length);
+                resultado = resultado.replace(/<meta name="data-atualizacao" content="[^"]*">/, '<meta name="data-atualizacao" content="' + agora + '">');
+                return resultado;
+            });
+    }
+
+    // ── INIT ──
+    rebuildMap();
+    updateStats();
+    setupAutocomplete();
+</script>
+</body>
+</html>
