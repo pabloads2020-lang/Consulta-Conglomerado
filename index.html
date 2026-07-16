@@ -179,10 +179,22 @@
         /* ── Stats bar ── */
         .stats-bar { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:18px; }
         .stat-pill { display:inline-flex; align-items:center; gap:0; background:var(--bg3); border:1px solid var(--border); border-radius:20px; overflow:hidden; font-size:11px; font-weight:600; color:var(--text2); padding-right:14px; }
+        .stat-pill[data-filter] { cursor:pointer; transition:all .18s; user-select:none; }
+        .stat-pill[data-filter]:hover { border-color:var(--gold); color:var(--text); }
+        .stat-pill[data-filter].active-stat { background:rgba(245,200,66,.14); border-color:var(--gold); color:var(--gold); }
         .stat-pill .dot { width:4px; align-self:stretch; flex:0 0 4px; display:block; margin-right:10px; }
         .dot-gold  { background:var(--gold); }
         .dot-green { background:var(--green); }
         .dot-blue  { background:var(--blue); }
+
+        /* ── Lista (ao clicar num stat-pill) ── */
+        .list-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+        .list-header h2 { font-size:.85rem; font-weight:700; color:var(--text); margin:0; }
+        .list-close-btn { background:transparent; border:1px solid var(--border); border-radius:8px; padding:4px 12px; font-size:.72rem; font-weight:600; color:var(--text3); cursor:pointer; font-family:inherit; transition:.15s; }
+        .list-close-btn:hover { border-color:var(--red); color:var(--red); }
+        .list-rows { display:flex; flex-direction:column; gap:5px; max-height:520px; overflow-y:auto; }
+        .cong-row-main { flex:1; min-width:0; display:flex; flex-direction:column; gap:2px; }
+        .cong-row-sub { font-size:.7rem; color:var(--text3); }
 
         /* ── Search ── */
         .search-wrap { position:relative; }
@@ -354,6 +366,10 @@
 
     <div id="resultArea" style="display:none;">
         <div class="card result-anim" id="resultCard"></div>
+    </div>
+
+    <div id="listArea" style="display:none;">
+        <div class="card" id="listCard"></div>
     </div>
 
     <footer>💡 Dados embutidos nesta versão. Atualização apenas pelo administrador.</footer>
@@ -1441,6 +1457,7 @@
     {"CONGLOMERADO": "ZEMA CFI - PRUDENCIAL", "PARTICIPANTE": "ZEMA ADMINISTRADORA DE CONSÓRCIO LTDA", "TIPO": "PARTICIPANTE"}
     ];
     let regMap = new Map();
+    let activeStatFilter = null; // null | 'all' | 'conglomerados' | 'lideres'
     let searchInput, autocompleteDiv, clearBtn, currentFocus = -1;
 
     function normalizarTexto(str) {
@@ -1480,11 +1497,92 @@
         const total = registros.length;
         const congs = new Set(registros.map(r => r.CONGLOMERADO)).size;
         const lids  = registros.filter(r => r.TIPO.toUpperCase().includes('LIDER')).length;
-        document.getElementById('statsBar').innerHTML = `
-            <div class="stat-pill"><span class="dot dot-gold"></span>${total.toLocaleString('pt-BR')} participantes</div>
-            <div class="stat-pill"><span class="dot dot-blue"></span>${congs.toLocaleString('pt-BR')} conglomerados</div>
-            <div class="stat-pill"><span class="dot dot-green"></span>${lids.toLocaleString('pt-BR')} líderes</div>
+        const statsDiv = document.getElementById('statsBar');
+        statsDiv.innerHTML = `
+            <div class="stat-pill ${activeStatFilter==='all'?'active-stat':''}" data-filter="all" title="Ver todos os participantes"><span class="dot dot-gold"></span>${total.toLocaleString('pt-BR')} participantes</div>
+            <div class="stat-pill ${activeStatFilter==='conglomerados'?'active-stat':''}" data-filter="conglomerados" title="Ver lista de conglomerados"><span class="dot dot-blue"></span>${congs.toLocaleString('pt-BR')} conglomerados</div>
+            <div class="stat-pill ${activeStatFilter==='lideres'?'active-stat':''}" data-filter="lideres" title="Ver somente líderes"><span class="dot dot-green"></span>${lids.toLocaleString('pt-BR')} líderes</div>
         `;
+        statsDiv.querySelectorAll('.stat-pill[data-filter]').forEach(pill => {
+            pill.addEventListener('click', () => {
+                const filtro = pill.dataset.filter;
+                // Clicar no mesmo pill de novo fecha a lista; clicar em outro troca o filtro.
+                activeStatFilter = (activeStatFilter === filtro) ? null : filtro;
+                updateStats();
+                if (activeStatFilter) renderListaConglomerado();
+                else document.getElementById('listArea').style.display = 'none';
+            });
+        });
+    }
+
+    function renderListaConglomerado() {
+        const listCard = document.getElementById('listCard');
+        const titulos = { all: 'Todos os participantes', conglomerados: 'Conglomerados', lideres: 'Líderes' };
+        let rowsHtml = '';
+
+        if (activeStatFilter === 'conglomerados') {
+            // Uma linha por conglomerado (deduplicado), mostrando o líder e a contagem de participantes.
+            const porConglomerado = new Map();
+            registros.forEach(r => {
+                if (!porConglomerado.has(r.CONGLOMERADO)) porConglomerado.set(r.CONGLOMERADO, []);
+                porConglomerado.get(r.CONGLOMERADO).push(r);
+            });
+            const linhas = Array.from(porConglomerado.entries())
+                .map(([nome, membros]) => ({ nome, membros, lider: membros.find(m => m.TIPO.toUpperCase().includes('LIDER')) }))
+                .sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+            rowsHtml = linhas.map(l => `
+                <div class="sibling-row" data-p="${escapeHtml(l.lider ? l.lider.PARTICIPANTE : l.membros[0].PARTICIPANTE)}">
+                    <div class="sib-dot ${l.lider ? 'lider' : ''}"></div>
+                    <div class="cong-row-main">
+                        <div class="sib-name">${escapeHtml(l.nome)}</div>
+                        <div class="cong-row-sub">${l.lider ? 'Líder: ' + escapeHtml(l.lider.PARTICIPANTE) + ' · ' : ''}${l.membros.length} participante${l.membros.length !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>`).join('');
+        } else {
+            // 'all' ou 'lideres': lista de participantes (individual)
+            const items = (activeStatFilter === 'lideres')
+                ? registros.filter(r => r.TIPO.toUpperCase().includes('LIDER'))
+                : [...registros];
+            items.sort((a, b) => a.PARTICIPANTE.localeCompare(b.PARTICIPANTE, 'pt-BR'));
+            rowsHtml = items.map(r => {
+                const { cls, label } = getTipoBadge(r.TIPO);
+                return `
+                <div class="sibling-row" data-p="${escapeHtml(r.PARTICIPANTE)}">
+                    <div class="sib-dot ${r.TIPO.toUpperCase().includes('LIDER') ? 'lider' : ''}"></div>
+                    <div class="cong-row-main">
+                        <div class="sib-name">${escapeHtml(r.PARTICIPANTE)}</div>
+                        <div class="cong-row-sub">${escapeHtml(r.CONGLOMERADO)}</div>
+                    </div>
+                    <span class="tipo-badge ${cls}">${label}</span>
+                </div>`;
+            }).join('');
+        }
+
+        listCard.innerHTML = `
+            <div class="list-header">
+                <h2>📋 ${titulos[activeStatFilter]}</h2>
+                <button class="list-close-btn" id="listCloseBtn">✕ Fechar lista</button>
+            </div>
+            <div class="list-rows">${rowsHtml}</div>
+        `;
+        document.getElementById('listArea').style.display = 'block';
+
+        listCard.querySelectorAll('.sibling-row[data-p]').forEach(row => {
+            row.addEventListener('click', () => {
+                const found = registros.find(r => r.PARTICIPANTE === row.dataset.p);
+                if (found) {
+                    searchInput.value = found.PARTICIPANTE;
+                    renderDetalhes(found);
+                    if (clearBtn) clearBtn.style.display = 'flex';
+                    document.getElementById('resultArea').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                }
+            });
+        });
+        document.getElementById('listCloseBtn').addEventListener('click', () => {
+            activeStatFilter = null;
+            updateStats();
+            document.getElementById('listArea').style.display = 'none';
+        });
     }
 
     function renderDetalhes(reg) {
