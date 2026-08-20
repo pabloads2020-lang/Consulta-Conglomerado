@@ -10,13 +10,13 @@
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@400,0&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg:    #0d0f17;
-            --bg2:   #141720;
-            --bg3:   #1a1e2b;
+            --bg:    #07080B;
+            --bg2:   #0D0F14;
+            --bg3:   #12151C;
             --border:#2a2e3f;
-            --text:  #e1e3ef;
-            --text2: #9a9eb8;
-            --text3: #5c6080;
+            --text:  #F5F6F8;
+            --text2: #9CA1AC;
+            --text3: #767C8A;
             --gold:  #f5c842;
             --amber: #e0ac2c;
             --green: #2ecc71;
@@ -48,8 +48,9 @@
             --gold-topbar: #f5c842;
             --amber-topbar: #e0ac2c;
             font-family: 'DM Sans', 'Segoe UI', system-ui, sans-serif;
-            background: var(--bg-topbar);
-            border-bottom: 1px solid var(--border-topbar);
+            background: rgba(20,23,32,.3);
+            border-bottom: 1px solid rgba(255,255,255,.14);
+            box-shadow: 0 4px 16px -8px rgba(0,0,0,0.4), inset 0 -1px 0 rgba(255,255,255,.05);
             height: 52px;
             display: flex;
             align-items: center;
@@ -59,6 +60,8 @@
             position: sticky;
             top: 0;
             z-index: 200;
+            backdrop-filter: blur(8px) saturate(200%);
+            -webkit-backdrop-filter: blur(8px) saturate(200%);
         }
         body.light .hub-topbar {
             --bg-topbar: #ffffff;
@@ -68,6 +71,11 @@
             --text3-topbar: #8a90a8;
             --gold-topbar: #b8860b;
             --amber-topbar: #c47d00;
+            background: #ffffff;
+            border-bottom: 1px solid #d4d8e2;
+            box-shadow: none;
+            backdrop-filter: none;
+            -webkit-backdrop-filter: none;
         }
         .hub-topbar-left, .hub-topbar-right {
             display: flex;
@@ -245,7 +253,7 @@
         .result-icon {
             width:44px; height:44px; border-radius:12px;
             background:rgba(245,200,66,.08); border:1px solid rgba(245,200,66,.2);
-            display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0;
+            display:flex; align-items:center; justify-content:center; font-size:20px; flex-shrink:0; color:var(--gold);
         }
         .result-main { flex:1; min-width:0; }
         .result-participante { font-size:1.1rem; font-weight:700; color:var(--text); line-height:1.3; word-break:break-word; }
@@ -279,14 +287,14 @@
 
         /* ── Modal ── */
         .modal { display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,.75); z-index:1000; justify-content:center; align-items:center; }
-        .modal-content { background:var(--bg2); border:1px solid var(--border); border-radius:20px; padding:28px; width:90%; max-width:400px; }
-        .modal-content h3 { font-size:1rem; font-weight:700; color:var(--gold); margin-bottom:16px; }
+        .modal-content { background:rgba(20,23,32,.55); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border:1px solid rgba(255,255,255,.1); box-shadow: 0 30px 70px -20px rgba(0,0,0,.7), inset 0 1px 0 rgba(255,255,255,.06); border-radius:20px; padding:28px; width:90%; max-width:400px; }
+        .modal-content h3 { font-size:1rem; font-weight:700; color:var(--gold); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
         .modal-content input[type=password] {
-            width:100%; background:var(--bg3); border:1px solid var(--border);
+            width:100%; background:rgba(255,255,255,.03); border:1px solid rgba(255,255,255,.1);
             padding:10px 16px; border-radius:30px; color:var(--text);
             font-family:inherit; font-size:.9rem; margin:12px 0;
         }
-        .modal-content input[type=password]:focus { outline:none; border-color:var(--amber); }
+        .modal-content input[type=password]:focus { outline:none; border-color:rgba(255,255,255,.25); }
         .upload-area-sm {
             border:1px dashed var(--border); border-radius:12px;
             padding:16px; text-align:center; margin-top:12px; cursor:pointer;
@@ -295,7 +303,7 @@
         .upload-area-sm:hover { border-color:var(--amber); color:var(--text2); }
         .upload-area-sm input[type=file] { display:none; }
         .flex-btns { display:flex; gap:10px; justify-content:flex-end; margin-top:16px; }
-        .btn { background:var(--bg3); border:1px solid var(--border); padding:8px 20px; border-radius:30px; color:var(--text2); font-family:inherit; font-size:.82rem; cursor:pointer; transition:.2s; }
+        .btn { background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.1); padding:8px 20px; border-radius:30px; color:var(--text2); font-family:inherit; font-size:.82rem; cursor:pointer; transition:.2s; }
         .btn:hover { border-color:var(--amber); color:var(--gold); }
 
         /* ── Empty / footer ── */
@@ -340,7 +348,7 @@
             <div>
                 <div class="page-title">Conglomerados Prudenciais</div>
             </div>
-            <button class="admin-btn" id="adminBtn">🔧 Atualizar base</button>
+            <button class="admin-btn" id="adminBtn">Atualizar base</button>
         </div>
         <div class="page-subtitle">
             Consulte a qual conglomerado prudencial pertence cada participante — Base do Banco Central
@@ -350,7 +358,7 @@
         <div id="statsBar" class="stats-bar"></div>
 
         <div class="search-wrap">
-            <label>🔍 Digite o nome do participante (mínimo 2 letras)</label>
+            <label>Digite o nome do participante (mínimo 2 letras)</label>
             <div class="search-inner">
                 <form onsubmit="return false;" autocomplete="off">
                     <input type="hidden" name="dummy" value="prevent-pwd-manager">
@@ -372,17 +380,17 @@
         <div class="card" id="listCard"></div>
     </div>
 
-    <footer>💡 Dados embutidos nesta versão. Atualização apenas pelo administrador.</footer>
+    <footer>Dados embutidos nesta versão. Atualização apenas pelo administrador.</footer>
 </div>
 
 <!-- Admin modal -->
 <div id="adminModal" class="modal">
     <div class="modal-content">
-        <h3>🔐 Atualização de dados</h3>
+        <h3><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="4" y="11" width="16" height="9" rx="2"></rect><path d="M8 11V7a4 4 0 0 1 8 0v4"></path></svg>Atualização de dados</h3>
         <form onsubmit="return false;" autocomplete="off">
             <input type="password" id="adminPassword" placeholder="Senha de administrador" autocomplete="new-password">
             <div id="uploadAreaModal" class="upload-area-sm" style="display:none;">
-                <div>📂 Clique ou arraste o novo arquivo Excel</div>
+                <div>Clique ou arraste o novo arquivo Excel</div>
                 <div style="font-size:.72rem;margin-top:4px;color:var(--text3);">Colunas: NOME DO CONGLOMERADO · NOME DO PARTICIPANTE · TIPO PARTICIPAÇÃO</div>
                 <input type="file" id="adminFileInput" accept=".xlsx,.xls" autocomplete="off">
             </div>
@@ -1560,7 +1568,7 @@
 
         listCard.innerHTML = `
             <div class="list-header">
-                <h2>📋 ${titulos[activeStatFilter]}</h2>
+                <h2>${titulos[activeStatFilter]}</h2>
                 <button class="list-close-btn" id="listCloseBtn">✕ Fechar lista</button>
             </div>
             <div class="list-rows">${rowsHtml}</div>
@@ -1610,7 +1618,7 @@
 
         resultCard.innerHTML = `
             <div class="result-header">
-                <div class="result-icon">🏦</div>
+                <div class="result-icon"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M3 21h18"></path><path d="M5 21V9l7-5 7 5v12"></path><path d="M9 9v6"></path><path d="M15 9v6"></path></svg></div>
                 <div class="result-main">
                     <div class="result-participante">${escapeHtml(reg.PARTICIPANTE)}</div>
                     <div class="result-cong-label">Conglomerado Prudencial</div>
@@ -1728,7 +1736,7 @@
 
     document.getElementById('hubBackBtn')?.addEventListener('click', () => {
         if (window.self !== window.top) window.parent.postMessage({action:'hubNavigate', target:'home'}, '*');
-        else window.location.href = "https://pabloads2020-lang.github.io/Dashboard-Ferramentas-Integradas/";
+        else window.location.href = "https://pabloads2020-lang.github.io/Dashboard-Ferramentas-Integradas/dashboard.html";
     });
     document.getElementById('hubNewTabBtn')?.addEventListener('click', () => window.open(window.location.href, '_blank'));
 
@@ -1801,7 +1809,7 @@
         const a    = document.createElement('a');
         a.href = url; a.download = 'conglomerados_atualizado.html'; a.click();
         URL.revokeObjectURL(url);
-        alert('✅ Novo HTML gerado com ' + novos.length + ' participantes em ' + new Set(novos.map(r=>r.CONGLOMERADO)).size + ' conglomerados. Substitua o arquivo no servidor.');
+        alert('Novo HTML gerado com ' + novos.length + ' participantes em ' + new Set(novos.map(r=>r.CONGLOMERADO)).size + ' conglomerados. Substitua o arquivo no servidor.');
     }
 
     function gerarHTMLComDados(dados) {
